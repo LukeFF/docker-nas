@@ -2,6 +2,7 @@
 extends: default
 
 rules:
-  new-lines: dos
+  new-lines:
+    type: dos
   line-length:
     max: 200
