@@ -113,7 +113,7 @@ services:
     container_name: gitlab
     hostname: git.${DOMAIN}
     volumes:
-      - ${CONFIG}/gitlab/:/etc/gitlab
+      - ${CONFIG}/gitlab:/etc/gitlab
       - gitlab-logs:/var/log/gitlab
       - gitlab-data:/var/opt/gitlab
     environment:
@@ -125,6 +125,15 @@ services:
       traefik.port: "80"
       traefik.frontend.rule: "Host:git.${DOMAIN}"
     restart: always
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner
+    restart: always
+    volumes:
+      - ${CONFIG}/gitlab-runner:/etc/gitlab-runner
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
 
   plex:
     image: linuxserver/plex:latest

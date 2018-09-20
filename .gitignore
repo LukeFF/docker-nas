@@ -9,3 +9,6 @@ docker-compose.override.yml
 !/config/plex/.gitkeep
 /config/plexpy/*
 !/config/plexpy/.gitkeep
+/config/traefik/*
+!/config/traefik/traefik.toml
+!/config/traefik/.gitkeep
