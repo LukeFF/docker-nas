@@ -101,11 +101,11 @@ services:
       - PUID
       - TZ
     labels:
-      com.centurylinklabs.watchtower.enable: "true"
-      traefik.enable: "true"
-      traefik.port: "80"
-			traefik.frontend.rule: "Host:${DOMAIN}"
-			# traefik.frontend.auth.basic: "${HTPASSWD}"
+      - -com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+      - traefik.port=80
+			- traefik.frontend.rule=Host:${DOMAIN}
+			# - traefik.frontend.auth.basic:${HTPASSWD}
     restart: unless-stopped
 
   gitlab:
