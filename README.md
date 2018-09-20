@@ -10,21 +10,16 @@
 
 ## Included Containers/Services
 
-- [SABnzbd](https://hub.docker.com/r/linuxserver/sabnzbd/) (can be replaced with NZBGet - see further down)
-- [Sonarr](https://hub.docker.com/r/linuxserver/sonarr/)
-- [Radarr](https://hub.docker.com/r/linuxserver/radarr/)
-- [Lidarr](https://hub.docker.com/r/linuxserver/lidarr/)
-- [Mylar](https://hub.docker.com/r/linuxserver/mylar/)
-- [LazyLibrarian](https://hub.docker.com/r/linuxserver/lazylibrarian/)
-- [NZBHydra v2](https://hub.docker.com/r/linuxserver/hydra2/)
-- [Ombi](https://hub.docker.com/r/linuxserver/ombi/)
-- [FlexGet](https://hub.docker.com/r/cpoppema/docker-flexget/)
+- [Traefik](https://hub.docker.com/_/traefik/): a modern reverse proxy
+- [Watchtower](https://hub.docker.com/r/v2tec/watchtower/): Watches your containers and automatically restarts them whenever their image is refreshed.
+- [Nextcloud](https://hub.docker.com/_/nextcloud/): A safe home for all your data
+- [Heimdall](https://hub.docker.com/r/linuxserver/heimdall/): Heimdall is a way to organise all those links to your most used web sites and web applications in a simple way.
+- [Gitlab](https://hub.docker.com/r/gitlab/gitlab-ce/): GitLab Community Edition docker image based on the Omnibus package
 - [Plex](https://hub.docker.com/r/linuxserver/plex/)
 - [Tautulli (aka PlexPy)](https://hub.docker.com/r/linuxserver/tautulli/)
-- [Heimdall](https://hub.docker.com/r/linuxserver/heimdall/)
-- [Watchtower](https://hub.docker.com/r/v2tec/watchtower/)
-- [DDClient](https://hub.docker.com/r/linuxserver/ddclient/)
-
+- [Sonarr](https://hub.docker.com/r/linuxserver/sonarr/)
+- [Radarr](https://hub.docker.com/r/linuxserver/radarr/)
+- [SABnzbd](https://hub.docker.com/r/linuxserver/sabnzbd/) (can be replaced with NZBGet - see further down)
 
 ## Usage
 
@@ -34,11 +29,15 @@ Using `example.env`, create a file called `.env` (in the directory you cloned th
 
 | Variable         | Purpose                                                                                   |
 |------------------|-------------------------------------------------------------------------------------------|
+| TZ               | Your timezone. [List here.](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) |
+| DOMAIN           | The domain you want to use for access to services from outside your network               |
+| EMAIL            | The email you want to use for registering SSL certificates with [Let's Encrypt](https://letsencrypt.org/).         |
+|MYSQL_ROOT_PASSWORD | Your MariaDB root password |
+|NEXTCLOUD_MYSQL_USER| Your MariaDB user for Nextcloud |
+|NEXTCLOUD_MYSQL_PASSWORD| Your MariaDB password for Nextcloud
 | CONFIG           | Where the configs for services will live. Each service will have a subdirectory here      |
 | DOWNLOAD         | Where SAB will download files to. The complete and incomplete dirs will be put here       |
 | DATA             | Where your data is stored and where sub-directories for tv, movies, etc will be put       |
-| DOMAIN           | The domain you want to use for access to services from outside your network               |
-| TZ               | Your timezone. [List here.](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) |
 | HTPASSWD         | HTTP Basic Auth entries in HTPASSWD format ([generate here](http://www.htaccesstools.com/htpasswd-generator/))|
 
 Values for User ID (PUID) and Group ID (PGID) can be found by running `id user` where `user` is the owner of the volume directories on the host.
