@@ -25,7 +25,7 @@ services:
       traefik.enable: "true"
       traefik.frontend.rule: "Host:monitor.${DOMAIN}"
       traefik.port: "8080"
-#      traefik.frontend.auth.basic: "${HTPASSWD}"
+      #traefik.frontend.auth.basic: "${HTPASSWD}"
       com.centurylinklabs.watchtower.enable: "true"
     restart: unless-stopped
 
@@ -63,9 +63,9 @@ services:
       traefik.enable: "true"
       traefik.frontend.rule: "Host:adminer.${DOMAIN}"
       traefik.port: "8080"
-#      traefik.frontend.auth.basic: "${HTPASSWD}"
+      #traefik.frontend.auth.basic: "${HTPASSWD}"
     restart: always
-  
+
   nextcloud:
     image: nextcloud:latest
     container_name: nextcloud
@@ -87,7 +87,7 @@ services:
       traefik.enable: "true"
       traefik.frontend.rule: "Host:cloud.${DOMAIN}"
       traefik.port: "80"
-#      traefik.frontend.auth.basic: "${HTPASSWD}"
+      #traefik.frontend.auth.basic: "${HTPASSWD}"
     restart: always
 
   heimdall:
@@ -177,7 +177,7 @@ services:
       traefik.enable: "true"
       traefik.port: "8181"
       traefik.frontend.rule: "Host:tautulli.${DOMAIN}"
-#      traefik.frontend.auth.basic: "${HTPASSWD}"
+			#traefik.frontend.auth.basic: "${HTPASSWD}"
       com.centurylinklabs.watchtower.enable: "true"
     restart: unless-stopped
 
@@ -200,7 +200,7 @@ services:
       traefik.enable: "true"
       traefik.port: "8989"
       traefik.frontend.rule: "Host:sonarr.${DOMAIN}"
-#      traefik.frontend.auth.basic: "${HTPASSWD}"
+			#traefik.frontend.auth.basic: "${HTPASSWD}"
       com.centurylinklabs.watchtower.enable: "true"
     restart: unless-stopped
 
@@ -223,7 +223,7 @@ services:
       traefik.port: "7878"
       traefik.frontend.rule: "Host:radarr.${DOMAIN}"
       traefik.frontend.auth.basic: "${HTPASSWD}"
-#      com.centurylinklabs.watchtower.enable: "true"
+			#com.centurylinklabs.watchtower.enable: "true"
     restart: unless-stopped
 
   sabnzbd:
