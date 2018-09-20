@@ -104,8 +104,8 @@ services:
       - -com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
       - traefik.port=80
-			- traefik.frontend.rule=Host:${DOMAIN}
-			# - traefik.frontend.auth.basic:${HTPASSWD}
+      - traefik.frontend.rule=Host:${DOMAIN}
+      # - traefik.frontend.auth.basic:${HTPASSWD}
     restart: unless-stopped
 
   gitlab:
@@ -177,7 +177,7 @@ services:
       traefik.enable: "true"
       traefik.port: "8181"
       traefik.frontend.rule: "Host:tautulli.${DOMAIN}"
-			# traefik.frontend.auth.basic: "${HTPASSWD}"
+      # traefik.frontend.auth.basic: "${HTPASSWD}"
       com.centurylinklabs.watchtower.enable: "true"
     restart: unless-stopped
 
@@ -200,7 +200,7 @@ services:
       traefik.enable: "true"
       traefik.port: "8989"
       traefik.frontend.rule: "Host:sonarr.${DOMAIN}"
-			# traefik.frontend.auth.basic: "${HTPASSWD}"
+      # traefik.frontend.auth.basic: "${HTPASSWD}"
       com.centurylinklabs.watchtower.enable: "true"
     restart: unless-stopped
 
@@ -223,7 +223,7 @@ services:
       traefik.port: "7878"
       traefik.frontend.rule: "Host:radarr.${DOMAIN}"
       # traefik.frontend.auth.basic: "${HTPASSWD}"
-			com.centurylinklabs.watchtower.enable: "true"
+      com.centurylinklabs.watchtower.enable: "true"
     restart: unless-stopped
 
   sabnzbd:
