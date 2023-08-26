@@ -17,6 +17,7 @@ services:
     env_file:
       - .env
     volumes:
+      - ${DATA}/traefik:/etc/traefik
       - /var/run/docker.sock:/car/run/docker.so:ro
     ports:
       - 80:80
