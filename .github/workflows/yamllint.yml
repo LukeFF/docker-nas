@@ -15,5 +15,7 @@ jobs:
         uses: actions/checkout@main
       - name: Run yamllint
         uses: actionshub/yamllint@main
+      - name: Prepare .env file
+        run: cp example.env .env
       - name: Validate docker-compose.yml
         run: docker compose config --quiet
