@@ -68,8 +68,8 @@ entryPoints:
 #           - "8.8.8.8:53"
 
 # -- (Optional) Disable TLS Cert verification check
-# serversTransport:
-#   insecureSkipVerify: true
+serversTransport:
+  insecureSkipVerify: true
 
 # -- (Optional) Overwrite Default Certificates
 tls:
@@ -85,7 +85,6 @@ tls:
 
 providers:
   docker:
-    # -- (Optional) Enable this, if you want to expose all containers automatically
     exposedByDefault: false
   file:
     directory: /etc/traefik
