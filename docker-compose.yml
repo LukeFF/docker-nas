@@ -18,7 +18,7 @@ services:
       - .env
     volumes:
       - ${DATA}/traefik:/etc/traefik
-      - /var/run/docker.sock:/var/run/docker.so:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - 80:80
       - 443:443
