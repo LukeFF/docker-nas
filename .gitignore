@@ -1,14 +1,2 @@
 .env
 docker-compose.override.yml
-
-/config/gitlab/*
-!/config/gitlab/.gitkeep
-/config/heimdall/*
-!/config/heimdall/.gitkeep
-/config/plex/*
-!/config/plex/.gitkeep
-/config/plexpy/*
-!/config/plexpy/.gitkeep
-/config/traefik/*
-!/config/traefik/traefik.toml
-!/config/traefik/.gitkeep
