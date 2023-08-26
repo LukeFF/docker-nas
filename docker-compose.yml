@@ -9,3 +9,15 @@ services:
     command: tunnel --no-autoupdate run
     env_file:
       - .env
+
+  traefik:
+    image: traefik:v2.10.4
+    container_name: traefik
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - /var/run/docker.sock:/car/run/docker.so:ro
+    ports:
+      - 80:80
+      - 443:443
