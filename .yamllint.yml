@@ -7,3 +7,4 @@ rules:
     level: warning
   new-lines:
     type: dos
+    level: warning
