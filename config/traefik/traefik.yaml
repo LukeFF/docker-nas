@@ -25,12 +25,11 @@ global:
 entryPoints:
   web:
     address: :80
-    # -- (Optional) Redirect all HTTP to HTTPS
-    # http:
-    #   redirections:
-    #     entryPoint:
-    #       to: websecure
-    #       scheme: https
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
   websecure:
     address: :443
   # -- (Optional) Add custom Entrypoint
@@ -73,12 +72,12 @@ entryPoints:
 #   insecureSkipVerify: true
 
 # -- (Optional) Overwrite Default Certificates
-# tls:
-#   stores:
-#     default:
-#       defaultCertificate:
-#         certFile: /etc/traefik/certs/cert.pem
-#         keyFile: /etc/traefik/certs/cert-key.pem
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/traefik/certs/cert.pem
+        keyFile: /etc/traefik/certs/key.pem
 # -- (Optional) Disable TLS version 1.0 and 1.1
 #   options:
 #     default:

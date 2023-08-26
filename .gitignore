@@ -1,5 +1,5 @@
 .env
 docker-compose.override.yml
 
-/certs/*
-!/certs/.gitkeep
+/config/traefik/certs/*
+!/config/traefik/certs/.gitkeep
