@@ -51,6 +51,16 @@ services:
       - ${DATA}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
+  homeassistant:
+    image: homeassistant/home-assistant:2023.9
+    container_name: homeassistant
+    restart: unless-stopped
+    network_mode: host
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/homeassistant:/config
+
   primelooter:
     image: ghcr.io/srhinos/primelooter:latest
     container_name: primelooter
