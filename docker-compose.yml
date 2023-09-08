@@ -3,7 +3,7 @@ version: "3.8"
 
 services:
   cloudflared:
-    image: cloudflare/cloudflared:2023.8.0
+    image: cloudflare/cloudflared:2023.8.1
     container_name: cloudflared
     restart: always
     command: tunnel --no-autoupdate run
@@ -38,6 +38,26 @@ services:
       - "traefik.http.routers.teleport-https.entrypoints=websecure"
       - "traefik.http.routers.teleport-https.rule=HostRegexp(`${DOMAIN}`, `{subhost:[a-z]+}.${DOMAIN}`)"
       - "traefik.http.routers.teleport-https.tls=true"
-      # - "traefik.http.routers.teleport-https.tls.certresolver=your-certresolver"
       - "traefik.http.routers.teleport-https.tls.domains[0].main=${DOMAIN}"
       - "traefik.http.routers.teleport-https.tls.domains[0].sans=*.${DOMAIN}"
+
+  homepage:
+    image: ghcr.io/benphelps/homepage:v0.6.29
+    container_name: homepage
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  primelooter:
+    image: ghcr.io/srhinos/primelooter:latest
+    container_name: primelooter
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/primelooter/cookies.txt:/app/cookies.txt
+      - ${DATA}/primelooter/publishers.txt:/app/publishers.txt
+      - ${DATA}/primelooter/game_codes.txt:/app/game_codes.txt
