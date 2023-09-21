@@ -21,7 +21,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
   teleport:
-    image: public.ecr.aws/gravitational/teleport-distroless:13
+    image: public.ecr.aws/gravitational/teleport-distroless:14
     container_name: teleport
     restart: unless-stopped
     env_file:
