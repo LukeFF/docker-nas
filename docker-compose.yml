@@ -52,7 +52,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
   homeassistant:
-    image: homeassistant/home-assistant:2023.9
+    image: homeassistant/home-assistant:2023.10
     container_name: homeassistant
     restart: unless-stopped
     network_mode: host
