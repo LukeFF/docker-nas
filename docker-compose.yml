@@ -55,6 +55,16 @@ services:
       - 'traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true'
       - 'traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'  # yamllint disable-line rule:line-length
 
+  homeassistant:
+    image: homeassistant/home-assistant:2023.9
+    container_name: homeassistant
+    restart: unless-stopped
+    network_mode: host
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/homeassistant:/config
+
   redis:
     image: redis:7
     container_name: redis
@@ -125,16 +135,6 @@ services:
   #   volumes:
   #     - ${DATA}/homepage:/app/config
   #     - /var/run/docker.sock:/var/run/docker.sock:ro
-
-  # homeassistant:
-  #   image: homeassistant/home-assistant:2023.9
-  #   container_name: homeassistant
-  #   restart: unless-stopped
-  #   network_mode: host
-  #   env_file:
-  #     - .env
-  #   volumes:
-  #     - ${DATA}/homeassistant:/config
 
   # primelooter:
   #   image: ghcr.io/srhinos/primelooter:latest
