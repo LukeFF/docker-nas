@@ -81,7 +81,7 @@ services:
       - ${DATA}/mariadb:/var/lib/mysql
 
   paperless:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    image: ghcr.io/paperless-ngx/paperless-ngx:1.17.4
     container_name: paperless
     restart: unless-stopped
     depends_on:
@@ -113,7 +113,7 @@ services:
       - 'traefik.http.services.paperless.loadbalancer.server.port=8000'
 
   gotenberg:
-    image: gotenberg/gotenberg:7.9
+    image: gotenberg/gotenberg:7.9.2
     container_name: gotenberg
     restart: unless-stopped
     command:
