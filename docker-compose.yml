@@ -56,7 +56,7 @@ services:
       - 'traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'  # yamllint disable-line rule:line-length
 
   homeassistant:
-    image: homeassistant/home-assistant:2023.9
+    image: homeassistant/home-assistant:2023.10
     container_name: homeassistant
     restart: unless-stopped
     network_mode: host
