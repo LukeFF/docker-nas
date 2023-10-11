@@ -1,5 +1,5 @@
 ---
-version: "3.8"
+version: '3.8'
 
 services:
   cloudflared:
@@ -14,60 +14,136 @@ services:
     image: traefik:v2.10.4
     container_name: traefik
     restart: unless-stopped
+    depends_on:
+      - authelia
     env_file:
       - .env
     volumes:
       - ${DATA}/traefik:/etc/traefik
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
-  teleport:
-    image: public.ecr.aws/gravitational/teleport-distroless:14
-    container_name: teleport
+  whoami:
+    image: traefik/whoami
+    container_name: whoami
     restart: unless-stopped
-    env_file:
-      - .env
-    volumes:
-      - ${DATA}/teleport/config:/etc/teleport
-      - ${DATA}/teleport/data:/var/lib/teleport
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.teleport.loadbalancer.server.port=3080"
-      - "traefik.http.services.teleport.loadbalancer.server.scheme=https"
-      - "traefik.http.routers.teleport-http.entrypoints=web"
-      - "traefik.http.routers.teleport-http.rule=HostRegexp(`${DOMAIN}`, `{subhost:[a-z]+}.${DOMAIN}`)"
-      - "traefik.http.routers.teleport-https.entrypoints=websecure"
-      - "traefik.http.routers.teleport-https.rule=HostRegexp(`${DOMAIN}`, `{subhost:[a-z]+}.${DOMAIN}`)"
-      - "traefik.http.routers.teleport-https.tls=true"
-      - "traefik.http.routers.teleport-https.tls.domains[0].main=${DOMAIN}"
-      - "traefik.http.routers.teleport-https.tls.domains[0].sans=*.${DOMAIN}"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.whoami.rule=Host(`whoami.${DOMAIN}`)'
+      - 'traefik.http.routers.whoami.entrypoints=websecure'
+      - 'traefik.http.routers.whoami.tls=true'
+      - 'traefik.http.routers.whoami.middlewares=cf-real-ip@file, authelia@docker'
+      - 'traefik.http.services.whoami.loadbalancer.passhostheader=true'
+      - 'traefik.http.services.whoami.loadbalancer.server.port=80'
 
-  homepage:
-    image: ghcr.io/benphelps/homepage:v0.7.0
-    container_name: homepage
+  authelia:
+    image: authelia/authelia:4.37.5
+    container_name: authelia
     restart: unless-stopped
     env_file:
       - .env
     volumes:
-      - ${DATA}/homepage:/app/config
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${DATA}/authelia:/config
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.authelia.rule=Host(`auth.${DOMAIN}`)'
+      - 'traefik.http.routers.authelia.entrypoints=websecure'
+      - 'traefik.http.routers.authelia.tls=true'
+      - 'traefik.http.routers.authelia.middlewares=cf-real-ip@file'
+      - 'traefik.http.services.authelia.loadbalancer.passhostheader=true'
+      - 'traefik.http.services.authelia.loadbalancer.server.port=9091'
+      - 'traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/authz/forward-auth?authelia_url=https://auth.${DOMAIN}'  # yamllint disable-line rule:line-length
+      - 'traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true'
+      - 'traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'  # yamllint disable-line rule:line-length
 
-  homeassistant:
-    image: homeassistant/home-assistant:2023.9
-    container_name: homeassistant
+  redis:
+    image: redis:7
+    container_name: redis
     restart: unless-stopped
-    network_mode: host
+    volumes:
+      - ${DATA}/redis:/data
+
+  mariadb:
+    image: mariadb:10
+    container_name: mariadb
+    restart: unless-stopped
     env_file:
       - .env
     volumes:
-      - ${DATA}/homeassistant:/config
+      - ${DATA}/mariadb:/var/lib/mysql
 
-  primelooter:
-    image: ghcr.io/srhinos/primelooter:latest
-    container_name: primelooter
+  paperless:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    container_name: paperless
     restart: unless-stopped
+    depends_on:
+      - mariadb
+      - redis
+      - gotenberg
+      - tika
     env_file:
       - .env
+    ports:
+      - 8000:8000
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000']
+      interval: 30s
+      timeout: 10s
+      retries: 5
     volumes:
-      - ${DATA}/primelooter/cookies.txt:/app/cookies.txt
-      - ${DATA}/primelooter/publishers.txt:/app/publishers.txt
-      - ${DATA}/primelooter/game_codes.txt:/app/game_codes.txt
+      - ${DATA}/paperless/data:/usr/src/paperless/data
+      - /mnt/user/paperless-media:/usr/src/paperless/media
+      - /mnt/user/paperless-export:/usr/src/paperless/export
+      - /mnt/user/paperless-import:/usr/src/paperless/consume
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.paperless.rule=Host(`paperless.${DOMAIN}`)'
+      - 'traefik.http.routers.paperless.entrypoints=websecure'
+      - 'traefik.http.routers.paperless.tls=true'
+      - 'traefik.http.routers.paperless.middlewares=cf-real-ip@file'
+      - 'traefik.http.services.paperless.loadbalancer.passhostheader=true'
+      - 'traefik.http.services.paperless.loadbalancer.server.port=8000'
+
+  gotenberg:
+    image: gotenberg/gotenberg:7.8
+    container_name: gotenberg
+    restart: unless-stopped
+    command:
+      - 'gotenberg'
+      - '--chromium-disable-javascript=true'
+      - '--chromium-allow-list=file:///tmp/.*'
+
+  tika:
+    image: ghcr.io/paperless-ngx/tika:2.9.0-minimal
+    container_name: tika
+    restart: unless-stopped
+
+  # homepage:
+  #   image: ghcr.io/benphelps/homepage:v0.7.0
+  #   container_name: homepage
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - ${DATA}/homepage:/app/config
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  # homeassistant:
+  #   image: homeassistant/home-assistant:2023.9
+  #   container_name: homeassistant
+  #   restart: unless-stopped
+  #   network_mode: host
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - ${DATA}/homeassistant:/config
+
+  # primelooter:
+  #   image: ghcr.io/srhinos/primelooter:latest
+  #   container_name: primelooter
+  #   restart: unless-stopped
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - ${DATA}/primelooter/cookies.txt:/app/cookies.txt
+  #     - ${DATA}/primelooter/publishers.txt:/app/publishers.txt
+  #     - ${DATA}/primelooter/game_codes.txt:/app/game_codes.txt
