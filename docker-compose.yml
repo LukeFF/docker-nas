@@ -51,9 +51,29 @@ services:
       - 'traefik.http.routers.authelia.middlewares=cf-real-ip@file'
       - 'traefik.http.services.authelia.loadbalancer.passhostheader=true'
       - 'traefik.http.services.authelia.loadbalancer.server.port=9091'
-      - 'traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/authz/forward-auth?authelia_url=https://auth.${DOMAIN}'  # yamllint disable-line rule:line-length
+      - 'traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/authz/forward-auth?authelia_url=https://auth.${DOMAIN}'
       - 'traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true'
-      - 'traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'  # yamllint disable-line rule:line-length
+      - 'traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
+
+  homepage:
+    image: ghcr.io/benphelps/homepage:v0.7.0
+    container_name: homepage
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 3000:3000
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.homepage.rule=Host(`www.${DOMAIN}`)||Host(`${DOMAIN}`)'
+      - 'traefik.http.routers.homepage.entrypoints=websecure'
+      - 'traefik.http.routers.homepage.tls=true'
+      - 'traefik.http.routers.homepage.middlewares=cf-real-ip@file, authelia@docker'
+      - 'traefik.http.services.homepage.loadbalancer.passhostheader=true'
+      - 'traefik.http.services.homepage.loadbalancer.server.port=3000'
 
   homeassistant:
     image: homeassistant/home-assistant:2023.10
@@ -125,16 +145,6 @@ services:
     image: ghcr.io/paperless-ngx/tika:2.9.0-minimal
     container_name: tika
     restart: unless-stopped
-
-  # homepage:
-  #   image: ghcr.io/benphelps/homepage:v0.7.0
-  #   container_name: homepage
-  #   restart: unless-stopped
-  #   env_file:
-  #     - .env
-  #   volumes:
-  #     - ${DATA}/homepage:/app/config
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro
 
   # primelooter:
   #   image: ghcr.io/srhinos/primelooter:latest
