@@ -183,7 +183,7 @@ services:
       - 'traefik.http.services.homarr.loadbalancer.server.port=3000'
 
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:1.8.6
+    image: lscr.io/linuxserver/prowlarr:1.8.1259
     container_name: prowlarr
     restart: unless-stopped
     env_file:
@@ -248,7 +248,7 @@ services:
       - 8083:8083
 
   changedetection:
-    image: lscr.io/linuxserver/changedetection.io:0.45.3
+    image: lscr.io/linuxserver/changedetection.io:0.45.20230906
     container_name: changedetection
     restart: unless-stopped
     env_file:
