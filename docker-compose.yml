@@ -220,7 +220,7 @@ services:
       - 8989:8989
 
   readarr:
-    image: lscr.io/linuxserver/readarr:0.3.6-develop
+    image: lscr.io/linuxserver/readarr:0.3.7-develop
     container_name: readarr
     restart: unless-stopped
     env_file:
