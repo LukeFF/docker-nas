@@ -3,6 +3,7 @@ version: '3.8'
 
 include:
   - ./adguardhome/docker-compose.yml
+  - ./mealie/docker-compose.yml
   - ./omada-controller/docker-compose.yml
 
 services:
