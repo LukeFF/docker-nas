@@ -4,7 +4,6 @@ version: '3.8'
 include:
   - ./adguardhome/docker-compose.yml
   - ./mealie/docker-compose.yml
-  - ./omada-controller/docker-compose.yml
 
 services:
   cloudflared:
@@ -221,7 +220,7 @@ services:
       - 8989:8989
 
   readarr:
-    image: lscr.io/linuxserver/readarr:0.3.8-develop
+    image: lscr.io/linuxserver/readarr:0.3.7-develop
     container_name: readarr
     restart: unless-stopped
     env_file:
@@ -234,7 +233,7 @@ services:
       - 8787:8787
 
   calibre-web:
-    image: lscr.io/linuxserver/calibre-web:0.6.21
+    image: lscr.io/linuxserver/calibre-web:0.6.20
     container_name: calibre-web
     restart: unless-stopped
     env_file:
