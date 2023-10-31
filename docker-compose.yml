@@ -7,7 +7,7 @@ include:
 
 services:
   cloudflared:
-    image: cloudflare/cloudflared:2023.8.2
+    image: cloudflare/cloudflared:2023.10.0
     container_name: cloudflared
     restart: always
     command: tunnel --no-autoupdate run
