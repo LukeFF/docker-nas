@@ -63,7 +63,7 @@ services:
       - ${DATA}/redis:/data
 
   mariadb:
-    image: mariadb:10.11.5
+    image: mariadb:10.11.6
     container_name: mariadb
     restart: unless-stopped
     env_file:
