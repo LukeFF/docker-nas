@@ -104,7 +104,7 @@ services:
       - 'traefik.http.services.paperless.loadbalancer.server.port=8000'
 
   gotenberg:
-    image: gotenberg/gotenberg:7.9.2
+    image: gotenberg/gotenberg:7.10.1
     container_name: gotenberg
     restart: unless-stopped
     command:
