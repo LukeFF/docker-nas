@@ -11,7 +11,7 @@ include:
 
 services:
   rclone:
-    image: rclone/rclone:1.65
+    image: rclone/rclone:1.65.0
     container_name: rclone
     restart: unless-stopped
     security_opt:
