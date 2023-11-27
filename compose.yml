@@ -11,7 +11,7 @@ include:
 
 services:
   rclone:
-    image: rclone/rclone:1.64.2
+    image: rclone/rclone:1.65
     container_name: rclone
     restart: unless-stopped
     security_opt:
@@ -28,7 +28,7 @@ services:
       - /etc/fuse.conf:/etc/fuse.conf:ro
 
   traefik:
-    image: traefik:v2.10
+    image: traefik:v2.10.5
     container_name: traefik
     restart: unless-stopped
     security_opt:
@@ -139,7 +139,7 @@ services:
 
   homarr:
     container_name: homarr
-    image: ghcr.io/ajnart/homarr:0.13.4
+    image: ghcr.io/ajnart/homarr:0.14.2
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -202,7 +202,7 @@ services:
       - 8989:8989
 
   readarr:
-    image: lscr.io/linuxserver/readarr:0.3.8-develop
+    image: lscr.io/linuxserver/readarr:0.3.10-develop
     container_name: readarr
     restart: unless-stopped
     security_opt:
