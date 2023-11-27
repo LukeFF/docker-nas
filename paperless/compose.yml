@@ -12,7 +12,7 @@ services:
       - ${DATA}/paperless/redis:/data
 
   paperless-mariadb:
-    image: mariadb:10
+    image: mariadb:11
     restart: unless-stopped
     volumes:
       - ${DATA}/paperless/mariadb:/var/lib/mysql
