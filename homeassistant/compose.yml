@@ -1,0 +1,13 @@
+---
+version: '3.8'
+
+services:
+  homeassistant:
+    image: homeassistant/home-assistant:2023.10
+    container_name: homeassistant
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    network_mode: host
+    volumes:
+      - ${DATA}/homeassistant:/config

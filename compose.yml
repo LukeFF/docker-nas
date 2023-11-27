@@ -1,0 +1,278 @@
+---
+version: '3.8'
+
+include:
+  - ./adguardhome/compose.yml
+  - ./homeassistant/compose.yml
+  # - ./mailserver/compose.yml
+  # - ./media/compose.yml
+  # - ./mealie/compose.yml
+  - ./paperless/compose.yml
+
+services:
+  rclone:
+    image: rclone/rclone:1.64.2
+    container_name: rclone
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    user: ${PUID}:${PGID}
+    cap_add:
+      - SYS_ADMIN
+    command: rcd --rc-web-gui --rc-web-gui-update --rc-web-gui-force-update --rc-web-gui-no-open-browser --rc-addr :5572 --rc-user ${RCLONE_USER} --rc-pass ${RCLONE_PASS}
+    volumes:
+      - ${DATA}/rclone:/config/rclone
+      - /mnt/user:/mnt/user:shared
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+      - /etc/fuse.conf:/etc/fuse.conf:ro
+
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - '--api=true'
+      - '--api.dashboard=true'
+      - '--api.insecure=false'
+      - '--pilot.dashboard=false'
+      - '--global.sendAnonymousUsage=false'
+      - '--global.checkNewVersion=false'
+      - '--providers.docker=true'
+      - '--providers.docker.exposedByDefault=false'
+      - '--entryPoints.http=true'
+      - '--entryPoints.http.address=:80/tcp'
+      - '--entryPoints.http.http.redirections.entryPoint.to=https'
+      - '--entryPoints.http.http.redirections.entryPoint.scheme=https'
+      - '--entryPoints.http.forwardedHeaders.trustedIPs=10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fc00::/7'
+      - '--entryPoints.http.proxyProtocol.trustedIPs=10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fc00::/7'
+      - '--entryPoints.http.forwardedHeaders.insecure=false'
+      - '--entryPoints.http.proxyProtocol.insecure=false'
+      - '--entryPoints.https=true'
+      - '--entryPoints.https.address=:443/tcp'
+      - '--entryPoints.https.forwardedHeaders.trustedIPs=10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fc00::/7'
+      - '--entryPoints.https.proxyProtocol.trustedIPs=10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fc00::/7'
+      - '--entryPoints.https.forwardedHeaders.insecure=false'
+      - '--entryPoints.https.proxyProtocol.insecure=false'
+      - '--certificatesresolvers.cloudflare.acme.dnschallenge=true'
+      - '--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare'
+      - '--certificatesresolvers.cloudflare.acme.email=${PUBLIC_EMAIL}'
+      - "--certificatesresolvers.cloudflare.acme.storage=/acme/acme-cloudflare.json"
+    depends_on:
+      - authelia
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ${DATA}/traefik/config:/config
+      - ${DATA}/traefik/acme:/acme
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.api.rule=Host(`traefik.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.api.entryPoints=https'
+      - 'traefik.http.routers.api.tls=true'
+      - 'traefik.http.routers.api.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.api.service=api@internal'
+      - 'traefik.http.routers.api.middlewares=authelia@docker'
+
+  authelia:
+    image: authelia/authelia:4.37
+    container_name: authelia
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ${DATA}/authelia:/config
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.authelia.rule=Host(`auth.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.authelia.entryPoints=https'
+      - 'traefik.http.routers.authelia.tls=true'
+      - 'traefik.http.routers.authelia.tls.certresolver=cloudflare'
+      - 'traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/verify?rd=https%3A%2F%2Fauth.example.com%2F'
+      - 'traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader=true'
+      - 'traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
+      - 'traefik.http.middlewares.authelia-basic.forwardAuth.address=http://authelia:9091/api/verify?auth=basic'
+      - 'traefik.http.middlewares.authelia-basic.forwardAuth.trustForwardHeader=true'
+      - 'traefik.http.middlewares.authelia-basic.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:10.8.11
+    container_name: jellyfin
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - DOCKER_MODS=linuxserver/mods:jellyfin-opencl-intel
+    volumes:
+      - ${DATA}/jellyfin:/config
+      - /mnt/user/Serien:/data/serien
+      - /mnt/user/Filme:/data/filme
+    devices:
+      - /dev/dri:/dev/dri
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.jellyfin.rule=Host(`media.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.jellyfin.entryPoints=https'
+      - 'traefik.http.routers.jellyfin.tls=true'
+      - 'traefik.http.routers.jellyfin.tls.certresolver=cloudflare'
+      - 'traefik.http.services.jellyfin.loadbalancer.server.port=8096'
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:1.7.0
+    container_name: jellyseerr
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ${DATA}/jellyseerr:/app/config
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.jellyseerr.rule=Host(`request.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.jellyseerr.entryPoints=https'
+      - 'traefik.http.routers.jellyseerr.tls=true'
+      - 'traefik.http.routers.jellyseerr.tls.certresolver=cloudflare'
+      - 'traefik.http.services.jellyseerr.loadbalancer.server.port=5055'
+
+  homarr:
+    container_name: homarr
+    image: ghcr.io/ajnart/homarr:0.13.4
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - BASE_URL=www.${LOCAL_DOMAIN}
+    volumes:
+      - ${DATA}/homarr:/app/data/configs
+      - ${DATA}/homarr-icons:/app/public/icons
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.homarr.rule=Host(`${LOCAL_DOMAIN}`, `www.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.homarr.entrypoints=websecure'
+      - 'traefik.http.routers.homarr.tls=true'
+      - 'traefik.http.routers.homarr.tls.certresolver=cloudflare'
+      # - 'traefik.http.routers.homarr.middlewares=authelia@docker'
+      - 'traefik.http.services.homarr.loadbalancer.server.port=7575'
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:1.8.1259
+    container_name: prowlarr
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/prowlarr:/config
+    ports:
+      - 9696:9696
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:5.0.3
+    container_name: radarr
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/radarr:/config
+      - /mnt/user/Filme:/movies
+      - /mnt/user/Downloads:/downloads
+    ports:
+      - 7878:7878
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:3.0.10
+    container_name: sonarr
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/sonarr:/config
+      - /mnt/user/Serien:/tv
+      - /mnt/user/Downloads:/downloads
+    ports:
+      - 8989:8989
+
+  readarr:
+    image: lscr.io/linuxserver/readarr:0.3.8-develop
+    container_name: readarr
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/readarr:/config
+      - /mnt/user/eBooks:/books
+      - /mnt/user/Downloads:/downloads
+    ports:
+      - 8787:8787
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:0.6.21
+    container_name: calibre-web
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    environment:
+      - DOCKER_MODS=linuxserver/mods:universal-calibre
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=1
+    volumes:
+      - ${DATA}/calibre-web:/config
+      - /mnt/user/eBooks:/books
+    ports:
+      - 8083:8083
+
+  changedetection:
+    image: lscr.io/linuxserver/changedetection.io:0.45.20230906
+    container_name: changedetection
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    # environment:
+      # - BASE_URL= #optional
+    volumes:
+      - ${DATA}/changedetection:/config
+    ports:
+      - 5000:5000
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:4.1.0
+    container_name: sabnzbd
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/sabnzbd:/config
+      - /mnt/user/Downloads:/downloads
+    ports:
+      - 8081:8080
+
+  pyload-ng:
+    image: lscr.io/linuxserver/pyload-ng:0.5.0
+    container_name: pyload-ng
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/pyload-ng:/config
+      - /mnt/user/Downloads:/downloads
+    ports:
+      - 8001:8000
+      - 9666:9666
