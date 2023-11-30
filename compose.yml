@@ -28,7 +28,7 @@ services:
       - /etc/fuse.conf:/etc/fuse.conf:ro
 
   traefik:
-    image: traefik:v2.10
+    image: traefik:3.0
     container_name: traefik
     restart: unless-stopped
     security_opt:
