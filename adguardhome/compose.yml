@@ -3,7 +3,7 @@ version: '3.8'
 
 services:
   adguardhome:
-    image: adguard/adguardhome:v0.107.41
+    image: adguard/adguardhome:v0.107.42
     container_name: adguardhome
     restart: unless-stopped
     security_opt:
