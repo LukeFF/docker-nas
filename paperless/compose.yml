@@ -12,7 +12,8 @@ services:
       - ${DATA}/paperless/redis:/data
 
   paperless-mariadb:
-    image: mariadb:10
+    image: mariadb:11
+    container_name: paperless-mariadb
     restart: unless-stopped
     volumes:
       - ${DATA}/paperless/mariadb:/var/lib/mysql
@@ -21,15 +22,15 @@ services:
       - .env
 
   paperless-ngx:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    image: ghcr.io/paperless-ngx/paperless-ngx:2.0
     container_name: paperless-ngx
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     depends_on:
       - paperless-redis
-      - gotenberg
-      - tika
+      - paperless-gotenberg
+      - paperless-tika
     env_file:
       - ../.env
       - .env
@@ -45,15 +46,24 @@ services:
       - /mnt/user/Paperless-Import:/usr/src/paperless/consume
     ports:
       - 8000:8000
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.paperless.rule=Host(`paperless.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.paperless.entryPoints=https'
+      - 'traefik.http.routers.paperless.tls=true'
+      - 'traefik.http.routers.paperless.tls.certresolver=cloudflare'
+      - 'traefik.http.services.paperless.loadbalancer.server.port=8000'
 
-  gotenberg:
-    image: docker.io/gotenberg/gotenberg:7.8
+  paperless-gotenberg:
+    image: gotenberg/gotenberg:7.10
+    container_name: paperless-gotenberg
     restart: unless-stopped
     command:
       - "gotenberg"
       - "--chromium-disable-javascript=true"
       - "--chromium-allow-list=file:///tmp/.*"
 
-  tika:
-    image: ghcr.io/paperless-ngx/tika:latest
+  paperless-tika:
+    image: ghcr.io/paperless-ngx/tika:2.9.0-minimal
+    container_name: paperless-tika
     restart: unless-stopped

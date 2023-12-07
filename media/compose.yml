@@ -1,0 +1,181 @@
+---
+version: '3.8'
+
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:10.8.11
+    container_name: jellyfin
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - DOCKER_MODS=linuxserver/mods:jellyfin-opencl-intel
+    volumes:
+      - ${DATA}/jellyfin:/config
+      - /mnt/user/Serien:/data/serien
+      - /mnt/user/Filme:/data/filme
+    devices:
+      - /dev/dri:/dev/dri
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.jellyfin.rule=Host(`media.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.jellyfin.entryPoints=https'
+      - 'traefik.http.routers.jellyfin.tls=true'
+      - 'traefik.http.routers.jellyfin.tls.certresolver=cloudflare'
+      - 'traefik.http.services.jellyfin.loadbalancer.server.port=8096'
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:1.7.0
+    container_name: jellyseerr
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ${DATA}/jellyseerr:/app/config
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.jellyseerr.rule=Host(`request.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.jellyseerr.entryPoints=https'
+      - 'traefik.http.routers.jellyseerr.tls=true'
+      - 'traefik.http.routers.jellyseerr.tls.certresolver=cloudflare'
+      - 'traefik.http.services.jellyseerr.loadbalancer.server.port=5055'
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:1.8.1259
+    container_name: prowlarr
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/prowlarr:/config
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.prowlarr.rule=Host(`prowlarr.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.prowlarr.entryPoints=https'
+      - 'traefik.http.routers.prowlarr.tls=true'
+      - 'traefik.http.routers.prowlarr.tls.certresolver=cloudflare'
+      - 'traefik.http.services.prowlarr.loadbalancer.server.port=9696'
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:5.0.3
+    container_name: radarr
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/radarr:/config
+      - /mnt/user/Filme:/movies
+      - /mnt/user/Downloads:/downloads
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.radarr.rule=Host(`radarr.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.radarr.entryPoints=https'
+      - 'traefik.http.routers.radarr.tls=true'
+      - 'traefik.http.routers.radarr.tls.certresolver=cloudflare'
+      - 'traefik.http.services.radarr.loadbalancer.server.port=7878'
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:3.0.10
+    container_name: sonarr
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/sonarr:/config
+      - /mnt/user/Serien:/tv
+      - /mnt/user/Downloads:/downloads
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.sonarr.rule=Host(`sonarr.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.sonarr.entryPoints=https'
+      - 'traefik.http.routers.sonarr.tls=true'
+      - 'traefik.http.routers.sonarr.tls.certresolver=cloudflare'
+      - 'traefik.http.services.sonarr.loadbalancer.server.port=8989'
+
+  readarr:
+    image: lscr.io/linuxserver/readarr:0.3.10-develop
+    container_name: readarr
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/readarr:/config
+      - /mnt/user/eBooks:/books
+      - /mnt/user/Downloads:/downloads
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.readarr.rule=Host(`readarr.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.readarr.entryPoints=https'
+      - 'traefik.http.routers.readarr.tls=true'
+      - 'traefik.http.routers.readarr.tls.certresolver=cloudflare'
+      - 'traefik.http.services.readarr.loadbalancer.server.port=8787'
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:0.6.21
+    container_name: calibre-web
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    environment:
+      - DOCKER_MODS=linuxserver/mods:universal-calibre
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=1
+    volumes:
+      - ${DATA}/calibre-web:/config
+      - /mnt/user/eBooks:/books
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.calibre.rule=Host(`calibre.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.calibre.entryPoints=https'
+      - 'traefik.http.routers.calibre.tls=true'
+      - 'traefik.http.routers.calibre.tls.certresolver=cloudflare'
+      - 'traefik.http.services.calibre.loadbalancer.server.port=8083'
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:4.1.0
+    container_name: sabnzbd
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/sabnzbd:/config
+      - /mnt/user/Downloads:/downloads
+    ports:
+      - 8081:8080
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.sabnzbd.rule=Host(`sabnzbd.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.sabnzbd.entryPoints=https'
+      - 'traefik.http.routers.sabnzbd.tls=true'
+      - 'traefik.http.routers.sabnzbd.tls.certresolver=cloudflare'
+      - 'traefik.http.services.sabnzbd.loadbalancer.server.port=8080'
+
+  pyload-ng:
+    image: lscr.io/linuxserver/pyload-ng:0.5.0
+    container_name: pyload-ng
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    volumes:
+      - ${DATA}/pyload-ng:/config
+      - /mnt/user/Downloads:/downloads
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.pyload.rule=Host(`pyload.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.pyload.entryPoints=https'
+      - 'traefik.http.routers.pyload.tls=true'
+      - 'traefik.http.routers.pyload.tls.certresolver=cloudflare'
+      - 'traefik.http.services.pyload.loadbalancer.server.port=8000'
