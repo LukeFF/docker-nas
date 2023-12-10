@@ -2,33 +2,18 @@
 version: '3.8'
 
 include:
+  # - ./lancache/compose.yml
   - ./adguardhome/compose.yml
   - ./homeassistant/compose.yml
   # - ./mailserver/compose.yml
   # - ./media/compose.yml
   # - ./mealie/compose.yml
   - ./paperless/compose.yml
+  - ./twingate/compose.yml
 
 services:
-  rclone:
-    image: rclone/rclone:1.65.0
-    container_name: rclone
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    user: ${PUID}:${PGID}
-    cap_add:
-      - SYS_ADMIN
-    command: rcd --rc-web-gui --rc-web-gui-update --rc-web-gui-force-update --rc-web-gui-no-open-browser --rc-addr :5572 --rc-user ${RCLONE_USER} --rc-pass ${RCLONE_PASS}
-    volumes:
-      - ${DATA}/rclone:/config/rclone
-      - /mnt/user:/mnt/user:shared
-      - /etc/passwd:/etc/passwd:ro
-      - /etc/group:/etc/group:ro
-      - /etc/fuse.conf:/etc/fuse.conf:ro
-
   traefik:
-    image: traefik:v2.10.5
+    image: traefik:v2.10.7
     container_name: traefik
     restart: unless-stopped
     security_opt:
@@ -37,7 +22,6 @@ services:
       - '--api=true'
       - '--api.dashboard=true'
       - '--api.insecure=false'
-      - '--pilot.dashboard=false'
       - '--global.sendAnonymousUsage=false'
       - '--global.checkNewVersion=false'
       - '--providers.docker=true'
@@ -62,9 +46,11 @@ services:
       - "--certificatesresolvers.cloudflare.acme.storage=/acme/acme-cloudflare.json"
     depends_on:
       - authelia
+    env_file:
+      - .env
     ports:
-      - '80:80'
-      - '443:443'
+      - 80:80
+      - 443:443
     volumes:
       - ${DATA}/traefik/config:/config
       - ${DATA}/traefik/acme:/acme
@@ -99,44 +85,6 @@ services:
       - 'traefik.http.middlewares.authelia-basic.forwardAuth.trustForwardHeader=true'
       - 'traefik.http.middlewares.authelia-basic.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
 
-  jellyfin:
-    image: lscr.io/linuxserver/jellyfin:10.8.11
-    container_name: jellyfin
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - DOCKER_MODS=linuxserver/mods:jellyfin-opencl-intel
-    volumes:
-      - ${DATA}/jellyfin:/config
-      - /mnt/user/Serien:/data/serien
-      - /mnt/user/Filme:/data/filme
-    devices:
-      - /dev/dri:/dev/dri
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.jellyfin.rule=Host(`media.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.jellyfin.entryPoints=https'
-      - 'traefik.http.routers.jellyfin.tls=true'
-      - 'traefik.http.routers.jellyfin.tls.certresolver=cloudflare'
-      - 'traefik.http.services.jellyfin.loadbalancer.server.port=8096'
-
-  jellyseerr:
-    image: fallenbagel/jellyseerr:1.7.0
-    container_name: jellyseerr
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - ${DATA}/jellyseerr:/app/config
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.jellyseerr.rule=Host(`request.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.jellyseerr.entryPoints=https'
-      - 'traefik.http.routers.jellyseerr.tls=true'
-      - 'traefik.http.routers.jellyseerr.tls.certresolver=cloudflare'
-      - 'traefik.http.services.jellyseerr.loadbalancer.server.port=5055'
-
   homarr:
     container_name: homarr
     image: ghcr.io/ajnart/homarr:0.14.2
@@ -146,18 +94,20 @@ services:
     environment:
       - BASE_URL=www.${LOCAL_DOMAIN}
     volumes:
-      - ${DATA}/homarr:/app/data/configs
+      - ${DATA}/homarr-config:/app/data/configs
       - ${DATA}/homarr-icons:/app/public/icons
+      - ${DATA}/homarr-data:/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.homarr.rule=Host(`${LOCAL_DOMAIN}`, `www.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.homarr.entrypoints=websecure'
+      - 'traefik.http.routers.homarr.entrypoints=https'
       - 'traefik.http.routers.homarr.tls=true'
       - 'traefik.http.routers.homarr.tls.certresolver=cloudflare'
       # - 'traefik.http.routers.homarr.middlewares=authelia@docker'
       - 'traefik.http.services.homarr.loadbalancer.server.port=7575'
 
+<<<<<<< HEAD
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:1.8.1259
     container_name: prowlarr
@@ -233,6 +183,8 @@ services:
     ports:
       - 8083:8083
 
+=======
+>>>>>>> b50d09984e3f4d8a2ef75a4d79a48b40f064db75
   changedetection:
     image: lscr.io/linuxserver/changedetection.io:0.45.20230906
     container_name: changedetection
@@ -247,32 +199,3 @@ services:
       - ${DATA}/changedetection:/config
     ports:
       - 5000:5000
-
-  sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:4.1.0
-    container_name: sabnzbd
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    env_file:
-      - .env
-    volumes:
-      - ${DATA}/sabnzbd:/config
-      - /mnt/user/Downloads:/downloads
-    ports:
-      - 8081:8080
-
-  pyload-ng:
-    image: lscr.io/linuxserver/pyload-ng:0.5.0
-    container_name: pyload-ng
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    env_file:
-      - .env
-    volumes:
-      - ${DATA}/pyload-ng:/config
-      - /mnt/user/Downloads:/downloads
-    ports:
-      - 8001:8000
-      - 9666:9666
