@@ -2,14 +2,14 @@
 version: '3.8'
 
 include:
-  # - ./lancache/compose.yml
+  - ./lancache/compose.yml
   - ./adguardhome/compose.yml
   - ./homeassistant/compose.yml
   # - ./mailserver/compose.yml
-  # - ./media/compose.yml
+  - ./media/compose.yml
   # - ./mealie/compose.yml
   - ./paperless/compose.yml
-  - ./twingate/compose.yml
+  # - ./twingate/compose.yml
 
 services:
   traefik:
@@ -49,8 +49,8 @@ services:
     env_file:
       - .env
     ports:
-      - 80:80
-      - 443:443
+      - ${LOCAL_IP}:80:80
+      - ${LOCAL_IP}:443:443
     volumes:
       - ${DATA}/traefik/config:/config
       - ${DATA}/traefik/acme:/acme
@@ -115,9 +115,15 @@ services:
       - no-new-privileges:true
     env_file:
       - .env
-    # environment:
-      # - BASE_URL= #optional
+    environment:
+      - BASE_URL=https://change.${LOCAL_DOMAIN}/
     volumes:
       - ${DATA}/changedetection:/config
-    ports:
-      - 5000:5000
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.change.rule=Host(`change.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.change.entrypoints=https'
+      - 'traefik.http.routers.change.tls=true'
+      - 'traefik.http.routers.change.tls.certresolver=cloudflare'
+      # - 'traefik.http.routers.change.middlewares=authelia@docker'
+      - 'traefik.http.services.change.loadbalancer.server.port=5000'

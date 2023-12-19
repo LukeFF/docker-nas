@@ -46,8 +46,6 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    env_file:
-      - .env
     volumes:
       - ${DATA}/prowlarr:/config
     labels:
@@ -64,8 +62,6 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    env_file:
-      - .env
     volumes:
       - ${DATA}/radarr:/config
       - /mnt/user/Filme:/movies
@@ -84,8 +80,6 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    env_file:
-      - .env
     volumes:
       - ${DATA}/sonarr:/config
       - /mnt/user/Serien:/tv
@@ -104,8 +98,6 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    env_file:
-      - .env
     volumes:
       - ${DATA}/readarr:/config
       - /mnt/user/eBooks:/books
@@ -124,8 +116,6 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    env_file:
-      - .env
     environment:
       - DOCKER_MODS=linuxserver/mods:universal-calibre
       - OAUTHLIB_RELAX_TOKEN_SCOPE=1
@@ -146,8 +136,6 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    env_file:
-      - .env
     volumes:
       - ${DATA}/sabnzbd:/config
       - /mnt/user/Downloads:/downloads
@@ -167,8 +155,6 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    env_file:
-      - .env
     volumes:
       - ${DATA}/pyload-ng:/config
       - /mnt/user/Downloads:/downloads

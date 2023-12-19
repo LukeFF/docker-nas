@@ -12,20 +12,20 @@ services:
       - ${DATA}/adguard/conf:/opt/adguardhome/conf
       - ${DATA}/adguard/work:/opt/adguardhome/work
     ports:
-      - 53:53/tcp
-      - 53:53/udp
-      - 67:67/udp
-      # - 68:68/udp
-      # - 80:80/tcp
-      # - 443:443/tcp
-      # - 443:443/udp
-      # - 3000:3000/tcp
-      - 853:853/tcp
-      - 784:784/udp
-      - 853:853/udp
-      - 8853:8853/udp
-      - 5443:5443/tcp
-      - 5443:5443/udp
+      - ${LOCAL_IP}:53:53/tcp
+      - ${LOCAL_IP}:53:53/udp
+      - ${LOCAL_IP}:67:67/udp
+      # - ${LOCAL_IP}:68:68/udp
+      # - ${LOCAL_IP}:80:80/tcp
+      # - ${LOCAL_IP}:443:443/tcp
+      # - ${LOCAL_IP}:443:443/udp
+      # - ${LOCAL_IP}:3000:3000/tcp
+      - ${LOCAL_IP}:853:853/tcp
+      - ${LOCAL_IP}:784:784/udp
+      - ${LOCAL_IP}:853:853/udp
+      - ${LOCAL_IP}:8853:8853/udp
+      - ${LOCAL_IP}:5443:5443/tcp
+      - ${LOCAL_IP}:5443:5443/udp
     labels:
       - 'traefik.enable=true'
       - 'traefik.http.routers.adguard.rule=Host(`adguard.${LOCAL_DOMAIN}`)'
