@@ -3,5 +3,5 @@
 ## Requirements
 
 - [Docker](https://www.docker.com/get-started/)
-- [Cloudflare Tunnel](https://www.cloudflare.com/de-de/products/tunnel/)
 - a Domain with Cloudflare nameservers
+- a Cloudflare API Token

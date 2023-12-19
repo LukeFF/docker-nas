@@ -2,8 +2,8 @@
 version: '3.8'
 
 include:
-  - ./lancache/compose.yml
   - ./adguardhome/compose.yml
+  # - ./lancache/compose.yml
   - ./homeassistant/compose.yml
   # - ./mailserver/compose.yml
   - ./media/compose.yml
