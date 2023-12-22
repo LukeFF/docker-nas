@@ -13,6 +13,19 @@ include:
   # - ./twingate/compose.yml
 
 services:
+  watchtower:
+    image: containerrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TZ
+      - WATCHTOWER_CLEANUP
+      - WATCHTOWER_SCHEDULE
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
   traefik:
     image: traefik:v2.10.7
     container_name: traefik
