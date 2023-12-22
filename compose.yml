@@ -56,11 +56,14 @@ services:
       - '--entryPoints.https.proxyProtocol.insecure=false'
       - '--certificatesresolvers.cloudflare.acme.dnschallenge=true'
       - '--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare'
+      - '--certificatesresolvers.cloudflare.acme.dnschallenge.resolvers=["1.1.1.1:53", "8.8.8.8:53"]'
       - '--certificatesresolvers.cloudflare.acme.email=${PUBLIC_EMAIL}'
       - "--certificatesresolvers.cloudflare.acme.storage=/acme/acme-cloudflare.json"
     environment:
       - TZ
-      - CF_DNS_API_TOKEN
+      - CF_API_EMAIL=${PUBLIC_EMAIL}
+      - CF_API_KEY
+      # - CF_DNS_API_TOKEN
     ports:
       - ${LOCAL_IP}:80:80
       - ${LOCAL_IP}:443:443
