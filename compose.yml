@@ -76,37 +76,22 @@ services:
       - 'traefik.http.routers.api.service=api@internal'
       # - 'traefik.http.routers.api.middlewares=authelia@docker'
 
-  # portainer:
-  #   image:  portainer/portainer-ce:2.19.4
-  #   container_name: portainer
-  #   restart: unless-stopped
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   volumes:
-  #     - ${DATA}/portainer/data:/data
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   labels:
-  #     - 'traefik.enable=true'
-  #     - 'traefik.http.routers.portainer.rule=Host(`portainer.${LOCAL_DOMAIN}`)'
-  #     - 'traefik.http.routers.portainer.entryPoints=https'
-  #     - 'traefik.http.routers.portainer.tls=true'
-  #     - 'traefik.http.routers.portainer.tls.certresolver=cloudflare'
-  #     - 'traefik.http.services.portainer.loadbalancer.server.port=9000'
-
-  rancher:
-    image: rancher/rancher:v2.8.0
-    container_name: rancher
+  portainer:
+    image:  portainer/portainer-ce:2.19.4
+    container_name: portainer
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    privileged: true
     volumes:
-      - ${DATA}/rancher/data:/var/lib/rancher
-      - ${DATA}/rancher/auditlog:/var/log/auditlog
+      - ${DATA}/portainer/data:/data
       - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - 8888:80
-      - 8443:443
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.portainer.rule=Host(`portainer.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.portainer.entryPoints=https'
+      - 'traefik.http.routers.portainer.tls=true'
+      - 'traefik.http.routers.portainer.tls.certresolver=cloudflare'
+      - 'traefik.http.services.portainer.loadbalancer.server.port=9000'
 
   changedetection:
     image: lscr.io/linuxserver/changedetection.io:0.45.20230906
