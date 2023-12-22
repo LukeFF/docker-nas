@@ -1,0 +1,73 @@
+---
+version: "3.9"
+
+services:
+  authentik-postgresql:
+    image: docker.io/library/postgres:12-alpine
+    container_name: authentik-postgresql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    environment:
+      POSTGRES_PASSWORD: ${PG_PASS:?database password required}
+      POSTGRES_USER: ${PG_USER:-authentik}
+      POSTGRES_DB: ${PG_DB:-authentik}
+    volumes:
+      - ${DATA}/authentik/postgresql:/var/lib/postgresql/data
+
+  authentik-redis:
+    image: docker.io/library/redis:alpine
+    container_name: authentik-redis
+    restart: unless-stopped
+    command: --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+    volumes:
+      - ${DATA}/authentik/redis:/data
+
+  authentik-server:
+    image: ghcr.io/goauthentik/server:2023.10.5
+    container_name: authentik-server
+    restart: unless-stopped
+    command: server
+    depends_on:
+      - authentik-postgresql
+      - authentik-redis
+    environment:
+      AUTHENTIK_REDIS__HOST: authentik-redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik-postgresql
+      AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
+      AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+    volumes:
+      - ${DATA}/authentik/media:/media
+      - ${DATA}/authentik/custom-templates:/templates
+
+  authentik-worker:
+    image: ghcr.io/goauthentik/server:2023.10.5
+    container_name: authentik-worker
+    restart: unless-stopped
+    command: worker
+    user: ${PUID}:${PGID}
+    depends_on:
+      - authentik-postgresql
+      - authentik-redis
+    environment:
+      AUTHENTIK_REDIS__HOST: authentik-redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik-postgresql
+      AUTHENTIK_POSTGRESQL__USER: ${PG_USER:-authentik}
+      AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
+    volumes:
+      - ${DATA}/authentik/media:/media
+      - ${DATA}/authentik/certs:/certs
+      - ${DATA}/authentik/custom-templates:/templates
+      - /var/run/docker.sock:/var/run/docker.sock:ro

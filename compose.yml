@@ -2,6 +2,7 @@
 version: '3.8'
 
 include:
+  # - ./authentik/compose.yml
   - ./adguardhome/compose.yml
   # - ./lancache/compose.yml
   - ./homeassistant/compose.yml
@@ -44,8 +45,6 @@ services:
       - '--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare'
       - '--certificatesresolvers.cloudflare.acme.email=${PUBLIC_EMAIL}'
       - "--certificatesresolvers.cloudflare.acme.storage=/acme/acme-cloudflare.json"
-    depends_on:
-      - authelia
     env_file:
       - .env
     ports:
@@ -62,50 +61,39 @@ services:
       - 'traefik.http.routers.api.tls=true'
       - 'traefik.http.routers.api.tls.certresolver=cloudflare'
       - 'traefik.http.routers.api.service=api@internal'
-      - 'traefik.http.routers.api.middlewares=authelia@docker'
+      # - 'traefik.http.routers.api.middlewares=authelia@docker'
 
-  authelia:
-    image: authelia/authelia:4.37
-    container_name: authelia
+  # portainer:
+  #   image:  portainer/portainer-ce:2.19.4
+  #   container_name: portainer
+  #   restart: unless-stopped
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - ${DATA}/portainer/data:/data
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   labels:
+  #     - 'traefik.enable=true'
+  #     - 'traefik.http.routers.portainer.rule=Host(`portainer.${LOCAL_DOMAIN}`)'
+  #     - 'traefik.http.routers.portainer.entryPoints=https'
+  #     - 'traefik.http.routers.portainer.tls=true'
+  #     - 'traefik.http.routers.portainer.tls.certresolver=cloudflare'
+  #     - 'traefik.http.services.portainer.loadbalancer.server.port=9000'
+
+  rancher:
+    image: rancher/rancher:v2.8.0
+    container_name: rancher
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    privileged: true
     volumes:
-      - ${DATA}/authelia:/config
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.authelia.rule=Host(`auth.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.authelia.entryPoints=https'
-      - 'traefik.http.routers.authelia.tls=true'
-      - 'traefik.http.routers.authelia.tls.certresolver=cloudflare'
-      - 'traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/verify?rd=https%3A%2F%2Fauth.example.com%2F'
-      - 'traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader=true'
-      - 'traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
-      - 'traefik.http.middlewares.authelia-basic.forwardAuth.address=http://authelia:9091/api/verify?auth=basic'
-      - 'traefik.http.middlewares.authelia-basic.forwardAuth.trustForwardHeader=true'
-      - 'traefik.http.middlewares.authelia-basic.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
-
-  homarr:
-    container_name: homarr
-    image: ghcr.io/ajnart/homarr:0.14.2
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      - BASE_URL=www.${LOCAL_DOMAIN}
-    volumes:
-      - ${DATA}/homarr-config:/app/data/configs
-      - ${DATA}/homarr-icons:/app/public/icons
-      - ${DATA}/homarr-data:/data
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.homarr.rule=Host(`${LOCAL_DOMAIN}`, `www.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.homarr.entrypoints=https'
-      - 'traefik.http.routers.homarr.tls=true'
-      - 'traefik.http.routers.homarr.tls.certresolver=cloudflare'
-      # - 'traefik.http.routers.homarr.middlewares=authelia@docker'
-      - 'traefik.http.services.homarr.loadbalancer.server.port=7575'
+      - ${DATA}/rancher/data:/var/lib/rancher
+      - ${DATA}/rancher/auditlog:/var/log/auditlog
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 8888:80
+      - 8443:443
 
   changedetection:
     image: lscr.io/linuxserver/changedetection.io:0.45.20230906
