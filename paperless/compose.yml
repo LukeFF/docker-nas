@@ -22,7 +22,7 @@ services:
       - .env
 
   paperless-ngx:
-    image: ghcr.io/paperless-ngx/paperless-ngx:2.1
+    image: ghcr.io/paperless-ngx/paperless-ngx:2.2
     container_name: paperless-ngx
     restart: unless-stopped
     security_opt:
