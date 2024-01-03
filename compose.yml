@@ -2,7 +2,7 @@
 version: '3.8'
 
 include:
-  # - ./authentik/compose.yml
+  - ./authentik/compose.yml
   - ./adguardhome/compose.yml
   # - ./lancache/compose.yml
   - ./homeassistant/compose.yml
