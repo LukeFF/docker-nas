@@ -2,7 +2,7 @@
 version: '3.8'
 
 include:
-  - ./authentik/compose.yml
+  # - ./authentik/compose.yml
   - ./adguardhome/compose.yml
   # - ./lancache/compose.yml
   - ./homeassistant/compose.yml
@@ -80,7 +80,7 @@ services:
       # - 'traefik.http.routers.api.middlewares=authelia@docker'
 
   portainer:
-    image:  portainer/portainer-ce:2.19.4
+    image: portainer/portainer-ce:2.19.4
     container_name: portainer
     restart: unless-stopped
     security_opt:
