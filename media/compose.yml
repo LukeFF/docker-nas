@@ -131,7 +131,7 @@ services:
       - 'traefik.http.services.calibre.loadbalancer.server.port=8083'
 
   sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:4.2.0
+    image: lscr.io/linuxserver/sabnzbd:4.2.1
     container_name: sabnzbd
     restart: unless-stopped
     security_opt:
