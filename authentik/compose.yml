@@ -34,7 +34,7 @@ services:
       - ${DATA}/authentik/redis:/data
 
   authentik-server:
-    image: ghcr.io/goauthentik/server:2023.10.5
+    image: ghcr.io/goauthentik/server:2023.10.6
     container_name: authentik-server
     restart: unless-stopped
     command: server
@@ -52,7 +52,7 @@ services:
       - ${DATA}/authentik/custom-templates:/templates
 
   authentik-worker:
-    image: ghcr.io/goauthentik/server:2023.10.5
+    image: ghcr.io/goauthentik/server:2023.10.6
     container_name: authentik-worker
     restart: unless-stopped
     command: worker
