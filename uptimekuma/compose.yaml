@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  uptimekuma:
+    image: louislam/uptime-kuma:1.23.11-alpine
+    container_name: uptimekuma
+    restart: unless-stopped
+    volumes:
+      - $DATA/uptimekuma:/app/data
+    networks:
+      - default
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.uptimekuma.rule=Host(`status.${DOMAIN}`)
+      - traefik.http.routers.uptimekuma.entryPoints=https
+      - traefik.http.routers.uptimekuma.tls=true
+      - traefik.http.routers.uptimekuma.tls.certresolver=cloudflare
+      - traefik.http.services.uptimekuma.loadbalancer.server.port=3001
+networks:
+  proxy:
+    external: true
+x-dockge:
+  urls:
+    - https://status.lan-t.cc

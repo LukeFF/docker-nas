@@ -1,0 +1,26 @@
+version: "3.8"
+services:
+  grafana:
+    image: grafana/grafana-oss:10.2.3
+    container_name: grafana
+    restart: unless-stopped
+    user: $PUID:$PGID
+    volumes:
+      - $DATA/grafana:/var/lib/grafana
+    networks:
+      - default
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.grafana.rule=Host(`grafana.$DOMAIN`)
+      - traefik.http.routers.grafana.entryPoints=https
+      - traefik.http.routers.grafana.tls=true
+      - traefik.http.routers.grafana.tls.certresolver=cloudflare
+      - traefik.http.services.grafana.loadbalancer.server.port=3000
+networks:
+  proxy:
+    external: true
+x-dockge:
+  urls:
+    - https://grafana.lan-t.cc

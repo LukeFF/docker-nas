@@ -1,17 +1,6 @@
 ---
 version: '3.8'
 
-include:
-  # - ./authentik/compose.yml
-  - ./adguardhome/compose.yml
-  # - ./lancache/compose.yml
-  - ./homeassistant/compose.yml
-  # - ./mailserver/compose.yml
-  - ./media/compose.yml
-  # - ./mealie/compose.yml
-  - ./paperless/compose.yml
-  # - ./twingate/compose.yml
-
 services:
   watchtower:
     image: containrrr/watchtower:latest
@@ -38,8 +27,8 @@ services:
       - '--api.insecure=false'
       - '--global.sendAnonymousUsage=false'
       - '--global.checkNewVersion=false'
-      - '--providers.docker=true'
       - '--providers.docker.exposedByDefault=false'
+      - '--providers.docker.watch=true'
       - '--entryPoints.http=true'
       - '--entryPoints.http.address=:80/tcp'
       - '--entryPoints.http.http.redirections.entryPoint.to=https'
@@ -56,63 +45,52 @@ services:
       - '--entryPoints.https.proxyProtocol.insecure=false'
       - '--certificatesresolvers.cloudflare.acme.dnschallenge=true'
       - '--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare'
-      - '--certificatesresolvers.cloudflare.acme.email=${PUBLIC_EMAIL}'
+      - '--certificatesresolvers.cloudflare.acme.email=$EMAIL'
       - "--certificatesresolvers.cloudflare.acme.storage=/acme/acme-cloudflare.json"
     environment:
       - TZ
-      - CF_API_EMAIL=${PUBLIC_EMAIL}
-      - CF_API_KEY
-      # - CF_DNS_API_TOKEN
+      - CLOUDFLARE_EMAIL=$EMAIL
+      - CLOUDFLARE_API_KEY
+    networks:
+      - proxy
     ports:
-      - ${LOCAL_IP}:80:80
-      - ${LOCAL_IP}:443:443
+      - 80:80
+      - 443:443
     volumes:
       - ${DATA}/traefik/config:/config
       - ${DATA}/traefik/acme:/acme
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.api.rule=Host(`traefik.${LOCAL_DOMAIN}`)'
+      - 'traefik.http.routers.api.rule=Host(`traefik.${DOMAIN}`)'
       - 'traefik.http.routers.api.entryPoints=https'
       - 'traefik.http.routers.api.tls=true'
       - 'traefik.http.routers.api.tls.certresolver=cloudflare'
       - 'traefik.http.routers.api.service=api@internal'
-      # - 'traefik.http.routers.api.middlewares=authelia@docker'
 
-  portainer:
-    image: portainer/portainer-ce:2.19.4
-    container_name: portainer
+  dockge:
+    image: louislam/dockge:1
+    container_name: dockge
     restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - ${DATA}/portainer/data:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.portainer.rule=Host(`portainer.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.portainer.entryPoints=https'
-      - 'traefik.http.routers.portainer.tls=true'
-      - 'traefik.http.routers.portainer.tls.certresolver=cloudflare'
-      - 'traefik.http.services.portainer.loadbalancer.server.port=9000'
-
-  changedetection:
-    image: lscr.io/linuxserver/changedetection.io:0.45.20230906
-    container_name: changedetection
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    env_file:
-      - .env
     environment:
-      - BASE_URL=https://change.${LOCAL_DOMAIN}/
+      - DOCKGE_STACKS_DIR=/mnt/user/docker-nas
     volumes:
-      - ${DATA}/changedetection:/config
+      - ${DATA}/dockge/data:/app/data
+      - /mnt/user/docker-nas:/mnt/user/docker-nas
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - proxy
+    ports:
+      - 5001:5001
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.change.rule=Host(`change.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.change.entrypoints=https'
-      - 'traefik.http.routers.change.tls=true'
-      - 'traefik.http.routers.change.tls.certresolver=cloudflare'
-      # - 'traefik.http.routers.change.middlewares=authelia@docker'
-      - 'traefik.http.services.change.loadbalancer.server.port=5000'
+      - 'traefik.docker.network=proxy'
+      - 'traefik.http.routers.dockge.rule=Host(`dockge.${DOMAIN}`)'
+      - 'traefik.http.routers.dockge.entryPoints=https'
+      - 'traefik.http.routers.dockge.tls=true'
+      - 'traefik.http.routers.dockge.tls.certresolver=cloudflare'
+      - 'traefik.http.services.dockge.loadbalancer.server.port=5001'
+
+networks:
+  proxy:
+    external: true

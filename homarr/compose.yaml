@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  homarr:
+    image: ghcr.io/ajnart/homarr:0.14.3
+    container_name: homarr
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - $DATA/homarr/configs:/app/data/configs
+      - $DATA/homarr/icons:/app/public/icons
+      - $DATA/homarr/data:/data
+    networks:
+      - default
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.homarr.rule=PathPrefix(`/`)
+      - traefik.http.routers.homarr.entryPoints=https
+      - traefik.http.routers.homarr.tls=true
+      - traefik.http.routers.homarr.tls.certresolver=cloudflare
+      - traefik.http.services.homarr.loadbalancer.server.port=7575
+networks:
+  proxy:
+    external: true
+x-dockge:
+  urls:
+    - https://lan-t.cc
+    - https://www.lan-t.cc

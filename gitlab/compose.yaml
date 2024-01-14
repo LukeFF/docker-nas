@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  gitlab-ce:
+    image: gitlab/gitlab-ce:16.7.3-ce.0
+    container_name: gitlab-ce
+    restart: unless-stopped
+    shm_size: 256m
+    hostname: gitlab.lan-t.cc
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.lan-t.cc'
+    volumes:
+      - $DATA/gitlab-ce/config:/etc/gitlab
+      - $DATA/gitlab-ce/logs:/var/log/gitlab
+      - $DATA/gitlab-ce/data:/var/opt/gitlab
+    networks:
+      - default
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.gitlab-ce.rule=Host(`gitlab.$DOMAIN`)
+      - traefik.http.routers.gitlab-ce.entryPoints=https
+      - traefik.http.routers.gitlab-ce.tls=true
+      - traefik.http.routers.gitlab-ce.tls.certresolver=cloudflare
+      - traefik.http.services.gitlab-ce.loadbalancer.server.port=80
+networks:
+  proxy:
+    external: true
+x-dockge:
+  urls:
+    - https://gitlab.lan-t.cc

@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  omada-exporter:
+    image: chhaley/omada_exporter:0.13
+    container_name: omada-exporter
+    restart: unless-stopped
+    ports:
+      - 9202:9202
+networks: {}

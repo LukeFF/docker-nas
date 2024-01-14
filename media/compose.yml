@@ -1,9 +1,7 @@
----
-version: '3.9'
-
+version: "3.8"
 services:
   jellyfin:
-    image: lscr.io/linuxserver/jellyfin:2021.12.16
+    image: linuxserver/jellyfin:10.8.13
     container_name: jellyfin
     restart: unless-stopped
     security_opt:
@@ -17,13 +15,15 @@ services:
     devices:
       - /dev/dri:/dev/dri
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.jellyfin.rule=Host(`media.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.jellyfin.entryPoints=https'
-      - 'traefik.http.routers.jellyfin.tls=true'
-      - 'traefik.http.routers.jellyfin.tls.certresolver=cloudflare'
-      - 'traefik.http.services.jellyfin.loadbalancer.server.port=8096'
-
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.jellyfin.rule=Host(`media.${DOMAIN}`)
+      - traefik.http.routers.jellyfin.entryPoints=https
+      - traefik.http.routers.jellyfin.tls=true
+      - traefik.http.routers.jellyfin.tls.certresolver=cloudflare
+      - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+    networks:
+      - proxy
   jellyseerr:
     image: fallenbagel/jellyseerr:1.7.0
     container_name: jellyseerr
@@ -33,15 +33,17 @@ services:
     volumes:
       - ${DATA}/jellyseerr:/app/config
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.jellyseerr.rule=Host(`request.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.jellyseerr.entryPoints=https'
-      - 'traefik.http.routers.jellyseerr.tls=true'
-      - 'traefik.http.routers.jellyseerr.tls.certresolver=cloudflare'
-      - 'traefik.http.services.jellyseerr.loadbalancer.server.port=5055'
-
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.jellyseerr.rule=Host(`request.${DOMAIN}`)
+      - traefik.http.routers.jellyseerr.entryPoints=https
+      - traefik.http.routers.jellyseerr.tls=true
+      - traefik.http.routers.jellyseerr.tls.certresolver=cloudflare
+      - traefik.http.services.jellyseerr.loadbalancer.server.port=5055
+    networks:
+      - proxy
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:1.8.1259
+    image: linuxserver/prowlarr:1.11.4
     container_name: prowlarr
     restart: unless-stopped
     security_opt:
@@ -49,15 +51,17 @@ services:
     volumes:
       - ${DATA}/prowlarr:/config
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.prowlarr.rule=Host(`prowlarr.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.prowlarr.entryPoints=https'
-      - 'traefik.http.routers.prowlarr.tls=true'
-      - 'traefik.http.routers.prowlarr.tls.certresolver=cloudflare'
-      - 'traefik.http.services.prowlarr.loadbalancer.server.port=9696'
-
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.prowlarr.rule=Host(`prowlarr.${DOMAIN}`)
+      - traefik.http.routers.prowlarr.entryPoints=https
+      - traefik.http.routers.prowlarr.tls=true
+      - traefik.http.routers.prowlarr.tls.certresolver=cloudflare
+      - traefik.http.services.prowlarr.loadbalancer.server.port=9696
+    networks:
+      - proxy
   radarr:
-    image: lscr.io/linuxserver/radarr:5.0.3
+    image: linuxserver/radarr:5.2.6
     container_name: radarr
     restart: unless-stopped
     security_opt:
@@ -67,15 +71,17 @@ services:
       - /mnt/user/Filme:/movies
       - /mnt/user/Downloads:/downloads
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.radarr.rule=Host(`radarr.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.radarr.entryPoints=https'
-      - 'traefik.http.routers.radarr.tls=true'
-      - 'traefik.http.routers.radarr.tls.certresolver=cloudflare'
-      - 'traefik.http.services.radarr.loadbalancer.server.port=7878'
-
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN}`)
+      - traefik.http.routers.radarr.entryPoints=https
+      - traefik.http.routers.radarr.tls=true
+      - traefik.http.routers.radarr.tls.certresolver=cloudflare
+      - traefik.http.services.radarr.loadbalancer.server.port=7878
+    networks:
+      - proxy
   sonarr:
-    image: lscr.io/linuxserver/sonarr:4.0.0
+    image: linuxserver/sonarr:4.0.0
     container_name: sonarr
     restart: unless-stopped
     security_opt:
@@ -85,15 +91,17 @@ services:
       - /mnt/user/Serien:/tv
       - /mnt/user/Downloads:/downloads
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.sonarr.rule=Host(`sonarr.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.sonarr.entryPoints=https'
-      - 'traefik.http.routers.sonarr.tls=true'
-      - 'traefik.http.routers.sonarr.tls.certresolver=cloudflare'
-      - 'traefik.http.services.sonarr.loadbalancer.server.port=8989'
-
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.sonarr.rule=Host(`sonarr.${DOMAIN}`)
+      - traefik.http.routers.sonarr.entryPoints=https
+      - traefik.http.routers.sonarr.tls=true
+      - traefik.http.routers.sonarr.tls.certresolver=cloudflare
+      - traefik.http.services.sonarr.loadbalancer.server.port=8989
+    networks:
+      - proxy
   readarr:
-    image: lscr.io/linuxserver/readarr:0.3.14-develop
+    image: linuxserver/readarr:0.3.14-develop
     container_name: readarr
     restart: unless-stopped
     security_opt:
@@ -103,15 +111,17 @@ services:
       - /mnt/user/eBooks:/books
       - /mnt/user/Downloads:/downloads
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.readarr.rule=Host(`readarr.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.readarr.entryPoints=https'
-      - 'traefik.http.routers.readarr.tls=true'
-      - 'traefik.http.routers.readarr.tls.certresolver=cloudflare'
-      - 'traefik.http.services.readarr.loadbalancer.server.port=8787'
-
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.readarr.rule=Host(`readarr.${DOMAIN}`)
+      - traefik.http.routers.readarr.entryPoints=https
+      - traefik.http.routers.readarr.tls=true
+      - traefik.http.routers.readarr.tls.certresolver=cloudflare
+      - traefik.http.services.readarr.loadbalancer.server.port=8787
+    networks:
+      - proxy
   calibre-web:
-    image: lscr.io/linuxserver/calibre-web:2021.12.16
+    image: linuxserver/calibre-web:0.6.21
     container_name: calibre-web
     restart: unless-stopped
     security_opt:
@@ -123,15 +133,17 @@ services:
       - ${DATA}/calibre-web:/config
       - /mnt/user/eBooks:/books
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.calibre.rule=Host(`calibre.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.calibre.entryPoints=https'
-      - 'traefik.http.routers.calibre.tls=true'
-      - 'traefik.http.routers.calibre.tls.certresolver=cloudflare'
-      - 'traefik.http.services.calibre.loadbalancer.server.port=8083'
-
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.calibre.rule=Host(`calibre.${DOMAIN}`)
+      - traefik.http.routers.calibre.entryPoints=https
+      - traefik.http.routers.calibre.tls=true
+      - traefik.http.routers.calibre.tls.certresolver=cloudflare
+      - traefik.http.services.calibre.loadbalancer.server.port=8083
+    networks:
+      - proxy
   sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:4.2.1
+    image: linuxserver/sabnzbd:4.2.1
     container_name: sabnzbd
     restart: unless-stopped
     security_opt:
@@ -142,15 +154,17 @@ services:
     ports:
       - 8081:8080
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.sabnzbd.rule=Host(`sabnzbd.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.sabnzbd.entryPoints=https'
-      - 'traefik.http.routers.sabnzbd.tls=true'
-      - 'traefik.http.routers.sabnzbd.tls.certresolver=cloudflare'
-      - 'traefik.http.services.sabnzbd.loadbalancer.server.port=8080'
-
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.sabnzbd.rule=Host(`sabnzbd.${DOMAIN}`)
+      - traefik.http.routers.sabnzbd.entryPoints=https
+      - traefik.http.routers.sabnzbd.tls=true
+      - traefik.http.routers.sabnzbd.tls.certresolver=cloudflare
+      - traefik.http.services.sabnzbd.loadbalancer.server.port=8080
+    networks:
+      - proxy
   pyload-ng:
-    image: lscr.io/linuxserver/pyload-ng:0.5.0
+    image: linuxserver/pyload-ng:0.5.0
     container_name: pyload-ng
     restart: unless-stopped
     security_opt:
@@ -159,9 +173,26 @@ services:
       - ${DATA}/pyload-ng:/config
       - /mnt/user/Downloads:/downloads
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.pyload.rule=Host(`pyload.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.pyload.entryPoints=https'
-      - 'traefik.http.routers.pyload.tls=true'
-      - 'traefik.http.routers.pyload.tls.certresolver=cloudflare'
-      - 'traefik.http.services.pyload.loadbalancer.server.port=8000'
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.pyload.rule=Host(`pyload.${DOMAIN}`)
+      - traefik.http.routers.pyload.entryPoints=https
+      - traefik.http.routers.pyload.tls=true
+      - traefik.http.routers.pyload.tls.certresolver=cloudflare
+      - traefik.http.services.pyload.loadbalancer.server.port=8000
+    networks:
+      - proxy
+networks:
+  proxy:
+    external: true
+x-dockge:
+  urls:
+    - https://media.lan-t.cc
+    - https://request.lan-t.cc
+    - https://prowlarr.lan-t.cc
+    - https://radarr.lan-t.cc
+    - https://sonarr.lan-t.cc
+    - https://readarr.lan-t.cc
+    - https://calibre.lan-t.cc
+    - https://sabnzbd.lan-t.cc
+    - https://pyload.lan-t.cc

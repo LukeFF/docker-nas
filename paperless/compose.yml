@@ -1,6 +1,4 @@
----
-version: '3.9'
-
+version: "3.8"
 services:
   paperless-redis:
     image: redis:7
@@ -10,17 +8,17 @@ services:
       - no-new-privileges:true
     volumes:
       - ${DATA}/paperless/redis:/data
-
   paperless-mariadb:
     image: mariadb:11
     container_name: paperless-mariadb
     restart: unless-stopped
+    environment:
+      - MARIADB_DATABASE=${PAPERLESS_DBNAME}
+      - MARIADB_USER=${PAPERLESS_DBUSER}
+      - MARIADB_PASSWORD=${PAPERLESS_DBPASS}
+      - MARIADB_ROOT_PASSWORD=${PAPERLESS_MARIADB_ROOT_PASSWORD}
     volumes:
       - ${DATA}/paperless/mariadb:/var/lib/mysql
-    env_file:
-      - ../.env
-      - .env
-
   paperless-ngx:
     image: ghcr.io/paperless-ngx/paperless-ngx:2.3
     container_name: paperless-ngx
@@ -31,39 +29,65 @@ services:
       - paperless-redis
       - paperless-gotenberg
       - paperless-tika
-    env_file:
-      - ../.env
-      - .env
     healthcheck:
-      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
+      test:
+        - CMD
+        - curl
+        - -fs
+        - -S
+        - --max-time
+        - "2"
+        - http://localhost:8000
       interval: 30s
       timeout: 10s
       retries: 5
+    environment:
+      - USERMAP_UID=${PUID}
+      - USERMAP_GID=${PGID}
+      - PAPERLESS_TIME_ZONE=${TZ}
+      - PAPERLESS_REDIS=redis://paperless-redis:6379
+      - PAPERLESS_DBENGINE=mariadb
+      - PAPERLESS_DBHOST=paperless-mariadb
+      - PAPERLESS_DBNAME
+      - PAPERLESS_DBUSER
+      - PAPERLESS_DBPASS
+      - PAPERLESS_TIKA_ENABLED=1
+      - PAPERLESS_TIKA_GOTENBERG_ENDPOINT=http://paperless-gotenberg:3000
+      - PAPERLESS_TIKA_ENDPOINT=http://paperless-tika:9998
+      - PAPERLESS_URL=https://paperless.${DOMAIN}
+      - PAPERLESS_OCR_LANGUAGES
+      - PAPERLESS_OCR_LANGUAGE
     volumes:
       - ${DATA}/paperless/data:/usr/src/paperless/data
       - /mnt/user/Paperless-Media:/usr/src/paperless/media
       - /mnt/user/Paperless-Export:/usr/src/paperless/export
       - /mnt/user/Paperless-Import:/usr/src/paperless/consume
-    ports:
-      - 8000:8000
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.paperless.rule=Host(`paperless.${LOCAL_DOMAIN}`)'
-      - 'traefik.http.routers.paperless.entryPoints=https'
-      - 'traefik.http.routers.paperless.tls=true'
-      - 'traefik.http.routers.paperless.tls.certresolver=cloudflare'
-      - 'traefik.http.services.paperless.loadbalancer.server.port=8000'
-
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.paperless.rule=Host(`paperless.${DOMAIN}`)
+      - traefik.http.routers.paperless.entryPoints=https
+      - traefik.http.routers.paperless.tls=true
+      - traefik.http.routers.paperless.tls.certresolver=cloudflare
+      - traefik.http.services.paperless.loadbalancer.server.port=8000
+    networks:
+      - default
+      - proxy
   paperless-gotenberg:
     image: gotenberg/gotenberg:8.0
     container_name: paperless-gotenberg
     restart: unless-stopped
     command:
-      - "gotenberg"
-      - "--chromium-disable-javascript=true"
-      - "--chromium-allow-list=file:///tmp/.*"
-
+      - gotenberg
+      - --chromium-disable-javascript=true
+      - --chromium-allow-list=file:///tmp/.*
   paperless-tika:
     image: ghcr.io/paperless-ngx/tika:2.9.0-minimal
     container_name: paperless-tika
     restart: unless-stopped
+networks:
+  proxy:
+    external: true
+x-dockge:
+  urls:
+    - https://paperless.lan-t.cc
