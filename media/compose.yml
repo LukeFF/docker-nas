@@ -101,7 +101,7 @@ services:
     networks:
       - proxy
   readarr:
-    image: linuxserver/readarr:0.3.14-develop
+    image: linuxserver/readarr:0.3.18-develop
     container_name: readarr
     restart: unless-stopped
     security_opt:
