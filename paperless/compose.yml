@@ -74,7 +74,7 @@ services:
       - default
       - proxy
   paperless-gotenberg:
-    image: gotenberg/gotenberg:8.0
+    image: gotenberg/gotenberg:8.2
     container_name: paperless-gotenberg
     restart: unless-stopped
     command:
