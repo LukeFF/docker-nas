@@ -20,7 +20,7 @@ services:
     volumes:
       - ${DATA}/paperless/mariadb:/var/lib/mysql
   paperless-ngx:
-    image: ghcr.io/paperless-ngx/paperless-ngx:2.3
+    image: ghcr.io/paperless-ngx/paperless-ngx:2.6
     container_name: paperless-ngx
     restart: unless-stopped
     security_opt:
@@ -74,7 +74,7 @@ services:
       - default
       - proxy
   paperless-gotenberg:
-    image: gotenberg/gotenberg:8.0
+    image: gotenberg/gotenberg:8.2
     container_name: paperless-gotenberg
     restart: unless-stopped
     command:
@@ -82,7 +82,7 @@ services:
       - --chromium-disable-javascript=true
       - --chromium-allow-list=file:///tmp/.*
   paperless-tika:
-    image: ghcr.io/paperless-ngx/tika:2.9.0-minimal
+    image: ghcr.io/paperless-ngx/tika:2.9.1-minimal
     container_name: paperless-tika
     restart: unless-stopped
 networks:
