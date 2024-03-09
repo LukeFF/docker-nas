@@ -185,14 +185,3 @@ services:
 networks:
   proxy:
     external: true
-x-dockge:
-  urls:
-    - https://media.lan-t.cc
-    - https://request.lan-t.cc
-    - https://prowlarr.lan-t.cc
-    - https://radarr.lan-t.cc
-    - https://sonarr.lan-t.cc
-    - https://readarr.lan-t.cc
-    - https://calibre.lan-t.cc
-    - https://sabnzbd.lan-t.cc
-    - https://pyload.lan-t.cc

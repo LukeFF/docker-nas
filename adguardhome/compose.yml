@@ -32,6 +32,3 @@ services:
 networks:
   proxy:
     external: true
-x-dockge:
-  urls:
-    - https://adguard.lan-t.cc

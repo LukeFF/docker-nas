@@ -20,6 +20,3 @@ services:
 networks:
   proxy:
     external: true
-x-dockge:
-  urls:
-    - https://status.lan-t.cc

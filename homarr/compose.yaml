@@ -23,7 +23,3 @@ services:
 networks:
   proxy:
     external: true
-x-dockge:
-  urls:
-    - https://lan-t.cc
-    - https://www.lan-t.cc

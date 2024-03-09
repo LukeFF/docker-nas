@@ -88,6 +88,3 @@ services:
 networks:
   proxy:
     external: true
-x-dockge:
-  urls:
-    - https://paperless.lan-t.cc
