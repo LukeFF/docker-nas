@@ -43,7 +43,7 @@ services:
     networks:
       - proxy
   prowlarr:
-    image: linuxserver/prowlarr:1.14.3
+    image: linuxserver/prowlarr:1.15.0
     container_name: prowlarr
     restart: unless-stopped
     security_opt:
