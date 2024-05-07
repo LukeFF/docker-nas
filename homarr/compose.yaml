@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   homarr:
-    image: ghcr.io/ajnart/homarr:0.15.2
+    image: ghcr.io/ajnart/homarr:0.15.3
     container_name: homarr
     restart: unless-stopped
     volumes:
