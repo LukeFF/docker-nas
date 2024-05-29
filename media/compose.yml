@@ -25,7 +25,7 @@ services:
     networks:
       - proxy
   jellyseerr:
-    image: fallenbagel/jellyseerr:1.8.1
+    image: fallenbagel/jellyseerr:1.9.0
     container_name: jellyseerr
     restart: unless-stopped
     security_opt:
