@@ -1,6 +1,4 @@
 ---
-version: '3.8'
-
 services:
   watchtower:
     image: containrrr/watchtower:latest
