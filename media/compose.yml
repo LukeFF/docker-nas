@@ -81,7 +81,7 @@ services:
     networks:
       - proxy
   sonarr:
-    image: linuxserver/sonarr:4.0.7
+    image: linuxserver/sonarr:4.0.8
     container_name: sonarr
     restart: unless-stopped
     security_opt:
