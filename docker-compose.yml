@@ -23,7 +23,7 @@ services:
       - TZ
       - WATCHTOWER_CLEANUP
       - WATCHTOWER_SCHEDULE
-      - WATCHTOWER_LABEL_ENABLE 
+      - WATCHTOWER_LABEL_ENABLE
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
