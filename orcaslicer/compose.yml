@@ -21,4 +21,3 @@ services:
       - traefik.http.routers.orcaslicer.tls=true
       - traefik.http.routers.orcaslicer.tls.certresolver=cloudflare
       - traefik.http.services.orcaslicer.loadbalancer.server.port=3000
-    
