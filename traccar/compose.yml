@@ -1,0 +1,28 @@
+---
+services:
+  traccar:
+    image: traccar/traccar:6.2-alpine
+    container_name: traccar
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID
+      - PGID
+      - TZ
+    volumes:
+      - ${DATA}/traccar/traccar.xml:/opt/traccar/conf/traccar.xml:ro
+      - ${DATA}/traccar/data:/opt/traccar/data
+      - ${DATA}/traccar/logs:/opt/traccar/logs
+    # ports:
+      # - 8082:8082
+      # - 5000-5150:5000-5150
+      # - 5000-5150:5000-5150/udp
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+      - traefik.http.routers.traccar.rule=Host(`traccar.${DOMAIN}`)
+      - traefik.http.routers.traccar.entryPoints=https
+      - traefik.http.routers.traccar.tls=true
+      - traefik.http.routers.traccar.tls.certresolver=cloudflare
+      - traefik.http.services.traccar.loadbalancer.server.port=8082

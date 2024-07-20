@@ -1,14 +1,15 @@
 ---
 include:
-  - ./adguardhome/compose.yml
-  - ./homarr/compose.yml
-  - ./homeassistant/compose.yml
-  - ./mealie/compose.yml
-  - ./media/compose.yml
-  - ./orcaslicer/compose.yml
-  - ./paperless/compose.yml
-  - ./speedtest-tracker/compose.yml
-  - ./uptimekuma/compose.yml
+  - adguardhome/compose.yml
+  - homarr/compose.yml
+  - homeassistant/compose.yml
+  - mealie/compose.yml
+  - media/compose.yml
+  - orcaslicer/compose.yml
+  - paperless/compose.yml
+  - speedtest-tracker/compose.yml
+  - traccar/compose.yml
+  - uptimekuma/compose.yml
 
 services:
   watchtower:
