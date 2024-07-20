@@ -12,7 +12,7 @@ services:
       - PGID
       - TZ
     # devices:
-      # - /path/to/device:/path/to/device
+    # - /path/to/device:/path/to/device
     volumes:
       - ${DATA}/homeassistant:/config
 

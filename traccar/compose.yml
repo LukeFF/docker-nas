@@ -15,9 +15,9 @@ services:
       - ${DATA}/traccar/data:/opt/traccar/data
       - ${DATA}/traccar/logs:/opt/traccar/logs
     # ports:
-      # - 8082:8082
-      # - 5000-5150:5000-5150
-      # - 5000-5150:5000-5150/udp
+    # - 8082:8082
+    # - 5000-5150:5000-5150
+    # - 5000-5150:5000-5150/udp
     labels:
       - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
