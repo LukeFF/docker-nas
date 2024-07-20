@@ -15,6 +15,7 @@ services:
     devices:
       - /dev/dri:/dev/dri
     labels:
+      - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
       - traefik.http.routers.jellyfin.rule=Host(`media.${DOMAIN}`)
       - traefik.http.routers.jellyfin.entryPoints=https
@@ -31,6 +32,7 @@ services:
     volumes:
       - ${DATA}/jellyseerr:/app/config
     labels:
+      - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
       - traefik.http.routers.jellyseerr.rule=Host(`request.${DOMAIN}`)
       - traefik.http.routers.jellyseerr.entryPoints=https
@@ -47,6 +49,7 @@ services:
     volumes:
       - ${DATA}/prowlarr:/config
     labels:
+      - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
       - traefik.http.routers.prowlarr.rule=Host(`prowlarr.${DOMAIN}`)
       - traefik.http.routers.prowlarr.entryPoints=https
@@ -65,6 +68,7 @@ services:
       - /mnt/user/Filme:/movies
       - /mnt/user/Downloads:/downloads
     labels:
+      - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
       - traefik.http.routers.radarr.rule=Host(`radarr.${DOMAIN}`)
       - traefik.http.routers.radarr.entryPoints=https
@@ -83,6 +87,7 @@ services:
       - /mnt/user/Serien:/tv
       - /mnt/user/Downloads:/downloads
     labels:
+      - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
       - traefik.http.routers.sonarr.rule=Host(`sonarr.${DOMAIN}`)
       - traefik.http.routers.sonarr.entryPoints=https
@@ -101,6 +106,7 @@ services:
       - /mnt/user/eBooks:/books
       - /mnt/user/Downloads:/downloads
     labels:
+      - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
       - traefik.http.routers.readarr.rule=Host(`readarr.${DOMAIN}`)
       - traefik.http.routers.readarr.entryPoints=https
@@ -121,6 +127,7 @@ services:
       - ${DATA}/calibre-web:/config
       - /mnt/user/eBooks:/books
     labels:
+      - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
       - traefik.http.routers.calibre.rule=Host(`calibre.${DOMAIN}`)
       - traefik.http.routers.calibre.entryPoints=https
@@ -137,9 +144,8 @@ services:
     volumes:
       - ${DATA}/sabnzbd:/config
       - /mnt/user/Downloads:/downloads
-    ports:
-      - 8081:8080
     labels:
+      - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
       - traefik.http.routers.sabnzbd.rule=Host(`sabnzbd.${DOMAIN}`)
       - traefik.http.routers.sabnzbd.entryPoints=https
@@ -157,6 +163,7 @@ services:
       - ${DATA}/pyload-ng:/config
       - /mnt/user/Downloads:/downloads
     labels:
+      - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
       - traefik.http.routers.pyload.rule=Host(`pyload.${DOMAIN}`)
       - traefik.http.routers.pyload.entryPoints=https

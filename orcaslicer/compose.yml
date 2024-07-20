@@ -1,7 +1,7 @@
 ---
 services:
   orcaslicer:
-    image: lscr.io/linuxserver/orcaslicer:latest
+    image: lscr.io/linuxserver/orcaslicer:2.1.1
     container_name: orcaslicer
     restart: unless-stopped
     security_opt:
@@ -13,14 +13,12 @@ services:
       - TZ
     volumes:
       - ${DATA}/orcaslicer:/config
-    ports:
-      - 3000:3000
-      - 3001:3001
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.orcaslicer.rule=Host(`slicer.${DOMAIN}`)'
-      - 'traefik.http.routers.orcaslicer.entryPoints=https'
-      - 'traefik.http.routers.orcaslicer.tls=true'
-      - 'traefik.http.routers.orcaslicer.tls.certresolver=cloudflare'
-      - 'traefik.http.services.orcaslicer.loadbalancer.server.port=3000'
+      - com.centurylinklabs.watchtower.enable=true
+      - traefik.enable=true
+      - traefik.http.routers.orcaslicer.rule=Host(`slicer.${DOMAIN}`)
+      - traefik.http.routers.orcaslicer.entryPoints=https
+      - traefik.http.routers.orcaslicer.tls=true
+      - traefik.http.routers.orcaslicer.tls.certresolver=cloudflare
+      - traefik.http.services.orcaslicer.loadbalancer.server.port=3000
     

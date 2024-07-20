@@ -4,6 +4,8 @@ services:
     image: ghcr.io/ajnart/homarr:0.15.3
     container_name: homarr
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
       - PUIG
       - PGID
@@ -14,6 +16,7 @@ services:
       - ${DATA}/homarr/icons:/app/public/icons
       - ${DATA}/homarr/data:/data
     labels:
+      - com.centurylinklabs.watchtower.enable=true
       - traefik.enable=true
       - traefik.http.routers.homarr.rule=PathPrefix(`/`)
       - traefik.http.routers.homarr.entryPoints=https
