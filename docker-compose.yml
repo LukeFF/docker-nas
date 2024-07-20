@@ -1,4 +1,15 @@
 ---
+include:
+  - ./adguardhome/compose.yml
+  - ./homarr/compose.yml
+  - ./homeassistant/compose.yml
+  - ./mealie/compose.yml
+  - ./media/compose.yml
+  - ./orcaslicer/compose.yml
+  - ./paperless/compose.yml
+  - ./speedtest-tracker/compose.yml
+  - ./uptimekuma/compose.yml
+
 services:
   watchtower:
     image: containrrr/watchtower:latest
@@ -7,6 +18,8 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
+      - PUID
+      - PGID
       - TZ
       - WATCHTOWER_CLEANUP
       - WATCHTOWER_SCHEDULE
@@ -14,7 +27,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   traefik:
-    image: traefik:v2.11.6
+    image: traefik:v3.1
     container_name: traefik
     restart: unless-stopped
     security_opt:
@@ -46,11 +59,11 @@ services:
       - '--certificatesresolvers.cloudflare.acme.email=$EMAIL'
       - "--certificatesresolvers.cloudflare.acme.storage=/acme/acme-cloudflare.json"
     environment:
+      - PUID
+      - PGID
       - TZ
       - CLOUDFLARE_EMAIL=$EMAIL
       - CLOUDFLARE_API_KEY
-    networks:
-      - proxy
     ports:
       - 80:80
       - 443:443
@@ -66,29 +79,31 @@ services:
       - 'traefik.http.routers.api.tls.certresolver=cloudflare'
       - 'traefik.http.routers.api.service=api@internal'
 
-  dockge:
-    image: louislam/dockge:1
-    container_name: dockge
+  code-server:
+    image: lscr.io/linuxserver/code-server:latest
+    container_name: code-server
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
-      - DOCKGE_STACKS_DIR=/mnt/user/docker-nas
+      - PUID
+      - PGID
+      - TZ
+      # - PASSWORD=password #optional
+      # - HASHED_PASSWORD= #optional
+      # - SUDO_PASSWORD=password #optional
+      # - SUDO_PASSWORD_HASH= #optional
+      - PROXY_DOMAIN=code.${DOMAIN}
+      - DEFAULT_WORKSPACE=/config/workspace
     volumes:
-      - ${DATA}/dockge/data:/app/data
-      - /mnt/user/docker-nas:/mnt/user/docker-nas
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - proxy
+      - ${DATA}/code-server:/config
+      - /mnt/user/docker-nas:/config/workspace/docker-nas
     ports:
-      - 5001:5001
+      - 8443:8443
     labels:
       - 'traefik.enable=true'
-      - 'traefik.docker.network=proxy'
-      - 'traefik.http.routers.dockge.rule=Host(`dockge.${DOMAIN}`)'
-      - 'traefik.http.routers.dockge.entryPoints=https'
-      - 'traefik.http.routers.dockge.tls=true'
-      - 'traefik.http.routers.dockge.tls.certresolver=cloudflare'
-      - 'traefik.http.services.dockge.loadbalancer.server.port=5001'
-
-networks:
-  proxy:
-    external: true
+      - 'traefik.http.routers.code.rule=Host(`code.${DOMAIN}`)'
+      - 'traefik.http.routers.code.entryPoints=https'
+      - 'traefik.http.routers.code.tls=true'
+      - 'traefik.http.routers.code.tls.certresolver=cloudflare'
+      - 'traefik.http.services.code.loadbalancer.server.port=8443'

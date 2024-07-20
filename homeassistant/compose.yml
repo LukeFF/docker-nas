@@ -1,42 +1,47 @@
-version: "3.9"
+---
 services:
   homeassistant:
-    image: homeassistant/home-assistant:2024.7
+    image: lscr.io/linuxserver/homeassistant:latest
     container_name: homeassistant
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     network_mode: host
+    environment:
+      - PUIG
+      - PGID
+      - TZ
+    # devices:
+      # - /path/to/device:/path/to/device #optional
     volumes:
-      - $DATA/homeassistant:/config
+      - ${DATA}/homeassistant:/config
+
   frigate:
     image: ghcr.io/blakeblackshear/frigate:0.13.2
     container_name: frigate
     restart: unless-stopped
     privileged: true
-    #cap_add:
-    #  - CAP_PERFMON
     security_opt:
       - no-new-privileges:true
-    shm_size: 128mb # update for your cameras based on calculation above
+    shm_size: 128mb
+    environment:
+      - PUIG
+      - PGID
+      - TZ
+      - FRIGATE_RTSP_PASSWORD
     devices:
-      #- /dev/bus/usb:/dev/bus/usb  # Passes the USB Coral, needs to be modified for other versions
-      - /dev/apex_0:/dev/apex_0 # Passes a PCIe Coral, follow driver instructions here https://coral.ai/docs/m2/get-started/#2a-on-linux
-      - /dev/dri/card0:/dev/dri/card0# For intel hwaccel, needs to be updated
-        for your hardware
+      - /dev/apex_0:/dev/apex_0
+      - /dev/dri/card0:/dev/dri/card0
+    ports:
+      - 5000:5000
+      - 8554:8554
+      - 8555:8555/tcp
+      - 8555:8555/udp
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - $DATA/frigate/config:/config
-      - $DATA/frigate/media:/media/frigate
+      - ${DATA}/frigate/config:/config
+      - ${DATA}/frigate/media:/media/frigate
       - type: tmpfs
         target: /tmp/cache
         tmpfs:
           size: 510000000
-    ports:
-      - 5000:5000
-      - 8554:8554 # RTSP feeds
-      - 8555:8555/tcp # WebRTC over tcp
-      - 8555:8555/udp # WebRTC over udp
-    environment:
-      - FRIGATE_RTSP_PASSWORD
-networks: {}

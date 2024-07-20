@@ -1,25 +1,22 @@
-version: "3.8"
+---
 services:
   homarr:
     image: ghcr.io/ajnart/homarr:0.15.3
     container_name: homarr
     restart: unless-stopped
+    environment:
+      - PUIG
+      - PGID
+      - TZ
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - $DATA/homarr/configs:/app/data/configs
-      - $DATA/homarr/icons:/app/public/icons
-      - $DATA/homarr/data:/data
-    networks:
-      - default
-      - proxy
+      - ${DATA}/homarr/configs:/app/data/configs
+      - ${DATA}/homarr/icons:/app/public/icons
+      - ${DATA}/homarr/data:/data
     labels:
       - traefik.enable=true
-      - traefik.docker.network=proxy
       - traefik.http.routers.homarr.rule=PathPrefix(`/`)
       - traefik.http.routers.homarr.entryPoints=https
       - traefik.http.routers.homarr.tls=true
       - traefik.http.routers.homarr.tls.certresolver=cloudflare
       - traefik.http.services.homarr.loadbalancer.server.port=7575
-networks:
-  proxy:
-    external: true
