@@ -1,7 +1,7 @@
 ---
 services:
   traccar:
-    image: traccar/traccar:6.3-alpine
+    image: traccar/traccar:6.4-alpine
     container_name: traccar
     restart: unless-stopped
     security_opt:
