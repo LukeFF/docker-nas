@@ -24,7 +24,7 @@ services:
       - traefik.http.services.jellyfin.loadbalancer.server.port=8096
 
   jellyseerr:
-    image: fallenbagel/jellyseerr:1.9.2
+    image: fallenbagel/jellyseerr:2.0.0
     container_name: jellyseerr
     restart: unless-stopped
     security_opt:
