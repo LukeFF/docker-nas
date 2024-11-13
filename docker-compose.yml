@@ -85,7 +85,7 @@ services:
       - traefik.http.routers.api.service=api@internal
 
   code-server:
-    image: lscr.io/linuxserver/code-server:4.95.1
+    image: lscr.io/linuxserver/code-server:4.95.2
     container_name: code-server
     restart: unless-stopped
     security_opt:
