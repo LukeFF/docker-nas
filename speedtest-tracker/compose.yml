@@ -1,7 +1,7 @@
 ---
 services:
   speedtest-tracker:
-    image: lscr.io/linuxserver/speedtest-tracker:0.21.5
+    image: lscr.io/linuxserver/speedtest-tracker:0.24.3
     container_name: speedtest-tracker
     restart: unless-stopped
     security_opt:
