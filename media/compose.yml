@@ -96,7 +96,7 @@ services:
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
 
   readarr:
-    image: linuxserver/readarr:0.4.4-develop
+    image: linuxserver/readarr:0.4.5-develop
     container_name: readarr
     restart: unless-stopped
     security_opt:
