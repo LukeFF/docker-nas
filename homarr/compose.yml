@@ -1,7 +1,7 @@
 ---
 services:
   homarr:
-    image: ghcr.io/ajnart/homarr:0.15.8
+    image: ghcr.io/ajnart/homarr:0.15.9
     container_name: homarr
     restart: unless-stopped
     security_opt:
