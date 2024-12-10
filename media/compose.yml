@@ -96,7 +96,7 @@ services:
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
 
   readarr:
-    image: linuxserver/readarr:0.4.4-develop
+    image: linuxserver/readarr:0.4.5-develop
     container_name: readarr
     restart: unless-stopped
     security_opt:
@@ -136,7 +136,7 @@ services:
       - traefik.http.services.calibre.loadbalancer.server.port=8083
 
   sabnzbd:
-    image: linuxserver/sabnzbd:4.3.3
+    image: linuxserver/sabnzbd:4.4.0
     container_name: sabnzbd
     restart: unless-stopped
     security_opt:
