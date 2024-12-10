@@ -28,7 +28,7 @@ services:
       - com.centurylinklabs.watchtower.enable=true
 
   paperless-ngx:
-    image: ghcr.io/paperless-ngx/paperless-ngx:2.12
+    image: ghcr.io/paperless-ngx/paperless-ngx:2.13
     container_name: paperless-ngx
     restart: unless-stopped
     security_opt:
@@ -80,7 +80,7 @@ services:
       - traefik.http.services.paperless.loadbalancer.server.port=8000
 
   paperless-gotenberg:
-    image: gotenberg/gotenberg:8.9
+    image: gotenberg/gotenberg:8.14
     container_name: paperless-gotenberg
     restart: unless-stopped
     security_opt:

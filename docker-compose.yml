@@ -1,113 +1,60 @@
 ---
 include:
+  - homepage/compose.yml
+  - authentik/compose.yml
   - adguardhome/compose.yml
-  - homarr/compose.yml
   - homeassistant/compose.yml
-  - mealie/compose.yml
+  - homepage/compose.yml
+  # - mailcow/docker-compose.yml
+  # - mealie/compose.yml
   - media/compose.yml
-  - orcaslicer/compose.yml
   - paperless/compose.yml
-  - speedtest-tracker/compose.yml
-  - traccar/compose.yml
-  - uptimekuma/compose.yml
+  # - traccar/compose.yml
 
 services:
-  watchtower:
-    image: containrrr/watchtower:1.7.1
-    container_name: watchtower
+  cloudflared:
+    image: cloudflare/cloudflared:2024.11.1
+    container_name: cloudflared
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command: tunnel --no-autoupdate run
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      TUNNEL_TOKEN: $TUNNEL_TOKEN
+
+  whatsupdocker:
+    image: getwud/wud:7.1.1
+    container_name: wud
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     environment:
-      - PUID
-      - PGID
-      - TZ
-      - WATCHTOWER_CLEANUP
-      - WATCHTOWER_SCHEDULE
-      - WATCHTOWER_LABEL_ENABLE
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    labels:
-      - com.centurylinklabs.watchtower.enable=true
-
-  traefik:
-    image: traefik:v3.1
-    container_name: traefik
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    command:
-      - --api=true
-      - --api.dashboard=true
-      - --api.insecure=false
-      - --global.sendAnonymousUsage=false
-      - --global.checkNewVersion=false
-      - --providers.docker.exposedByDefault=false
-      - --providers.docker.watch=true
-      - --entryPoints.http=true
-      - --entryPoints.http.address=:80/tcp
-      - --entryPoints.http.http.redirections.entryPoint.to=https
-      - --entryPoints.http.http.redirections.entryPoint.scheme=https
-      - --entryPoints.http.forwardedHeaders.trustedIPs=10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fc00::/7
-      - --entryPoints.http.proxyProtocol.trustedIPs=10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fc00::/7
-      - --entryPoints.http.forwardedHeaders.insecure=false
-      - --entryPoints.http.proxyProtocol.insecure=false
-      - --entryPoints.https=true
-      - --entryPoints.https.address=:443/tcp
-      - --entryPoints.https.forwardedHeaders.trustedIPs=10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fc00::/7
-      - --entryPoints.https.proxyProtocol.trustedIPs=10.0.0.0/8,172.16.0.0/16,192.168.0.0/16,fc00::/7
-      - --entryPoints.https.forwardedHeaders.insecure=false
-      - --entryPoints.https.proxyProtocol.insecure=false
-      - --certificatesresolvers.cloudflare.acme.dnschallenge=true
-      - --certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare
-      - --certificatesresolvers.cloudflare.acme.email=$EMAIL
-      - "--certificatesresolvers.cloudflare.acme.storage=/acme/acme-cloudflare.json"
-    environment:
-      - PUID
-      - PGID
-      - TZ
-      - CLOUDFLARE_EMAIL=$EMAIL
-      - CLOUDFLARE_API_KEY
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - ${DATA}/traefik/config:/config
-      - ${DATA}/traefik/acme:/acme
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    labels:
-      - com.centurylinklabs.watchtower.enable=true
-      - traefik.enable=true
-      - traefik.http.routers.api.rule=Host(`traefik.${DOMAIN}`)
-      - traefik.http.routers.api.entryPoints=https
-      - traefik.http.routers.api.tls=true
-      - traefik.http.routers.api.tls.certresolver=cloudflare
-      - traefik.http.routers.api.service=api@internal
 
   code-server:
-    image: lscr.io/linuxserver/code-server:4.92.2
+    image: lscr.io/linuxserver/code-server:4.95.3
     container_name: code-server
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     environment:
-      - PUID
-      - PGID
-      - TZ
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
       # - PASSWORD=password #optional
       # - HASHED_PASSWORD= #optional
       # - SUDO_PASSWORD=password #optional
       # - SUDO_PASSWORD_HASH= #optional
-      - PROXY_DOMAIN=code.${DOMAIN}
-      - DEFAULT_WORKSPACE=/config/workspace
+      PROXY_DOMAIN: code.$DOMAIN
+      DEFAULT_WORKSPACE: /config/workspace
     volumes:
-      - ${DATA}/code-server:/config
+      - $DATA/code-server:/config
       - /mnt/user/docker-nas:/config/workspace/docker-nas
-    labels:
-      - com.centurylinklabs.watchtower.enable=true
-      - traefik.enable=true
-      - traefik.http.routers.code.rule=Host(`code.${DOMAIN}`)
-      - traefik.http.routers.code.entryPoints=https
-      - traefik.http.routers.code.tls=true
-      - traefik.http.routers.code.tls.certresolver=cloudflare
-      - traefik.http.services.code.loadbalancer.server.port=8443
+      - /mnt/user/appdata:/config/workspace/appdata

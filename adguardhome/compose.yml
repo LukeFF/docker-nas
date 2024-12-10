@@ -1,15 +1,15 @@
 ---
 services:
   adguardhome:
-    image: adguard/adguardhome:v0.107.52
+    image: adguard/adguardhome:v0.107.54
     container_name: adguardhome
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     environment:
-      - PUIG
-      - PGID
-      - TZ
+      PUIG: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
     ports:
       - 53:53/tcp
       - 53:53/udp
@@ -26,13 +26,5 @@ services:
       - 5443:5443/tcp
       - 5443:5443/udp
     volumes:
-      - ${DATA}/adguard/conf:/opt/adguardhome/conf
-      - ${DATA}/adguard/work:/opt/adguardhome/work
-    labels:
-      - com.centurylinklabs.watchtower.enable=true
-      - traefik.enable=true
-      - traefik.http.routers.adguard.rule=Host(`adguard.${DOMAIN}`)
-      - traefik.http.routers.adguard.entryPoints=https
-      - traefik.http.routers.adguard.tls=true
-      - traefik.http.routers.adguard.tls.certresolver=cloudflare
-      - traefik.http.services.adguard.loadbalancer.server.port=80
+      - $DATA/adguard/conf:/opt/adguardhome/conf
+      - $DATA/adguard/work:/opt/adguardhome/work
