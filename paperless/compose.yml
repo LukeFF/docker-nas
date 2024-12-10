@@ -1,15 +1,13 @@
 ---
 services:
   paperless-redis:
-    image: redis:7
+    image: redis:7-alpine
     container_name: paperless-redis
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     volumes:
       - ${DATA}/paperless/redis:/data
-    labels:
-      - com.centurylinklabs.watchtower.enable=true
 
   paperless-mariadb:
     image: mariadb:11
@@ -24,8 +22,6 @@ services:
       - MARIADB_ROOT_PASSWORD=${PAPERLESS_MARIADB_ROOT_PASSWORD}
     volumes:
       - ${DATA}/paperless/mariadb:/var/lib/mysql
-    labels:
-      - com.centurylinklabs.watchtower.enable=true
 
   paperless-ngx:
     image: ghcr.io/paperless-ngx/paperless-ngx:2.13
@@ -70,14 +66,6 @@ services:
       - /mnt/user/Paperless-Media:/usr/src/paperless/media
       - /mnt/user/Paperless-Export:/usr/src/paperless/export
       - /mnt/user/Paperless-Import:/usr/src/paperless/consume
-    labels:
-      - com.centurylinklabs.watchtower.enable=true
-      - traefik.enable=true
-      - traefik.http.routers.paperless.rule=Host(`paperless.${DOMAIN}`)
-      - traefik.http.routers.paperless.entryPoints=https
-      - traefik.http.routers.paperless.tls=true
-      - traefik.http.routers.paperless.tls.certresolver=cloudflare
-      - traefik.http.services.paperless.loadbalancer.server.port=8000
 
   paperless-gotenberg:
     image: gotenberg/gotenberg:8.14
@@ -89,8 +77,6 @@ services:
       - gotenberg
       - --chromium-disable-javascript=true
       - --chromium-allow-list=file:///tmp/.*
-    labels:
-      - com.centurylinklabs.watchtower.enable=true
 
   paperless-tika:
     image: ghcr.io/paperless-ngx/tika:2.9.1-minimal
@@ -98,5 +84,3 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    labels:
-      - com.centurylinklabs.watchtower.enable=true

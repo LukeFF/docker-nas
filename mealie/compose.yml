@@ -16,11 +16,3 @@ services:
       - BASE_URL=https://mealie.${DOMAIN}
     volumes:
       - ${DATA}/mealie:/app/data
-    labels:
-      - com.centurylinklabs.watchtower.enable=true
-      - traefik.enable=true
-      - traefik.http.routers.mealie.rule=Host(`mealie.${DOMAIN}`)
-      - traefik.http.routers.mealie.entryPoints=https
-      - traefik.http.routers.mealie.tls=true
-      - traefik.http.routers.mealie.tls.certresolver=cloudflare
-      - traefik.http.services.mealie.loadbalancer.server.port=9000
