@@ -1,55 +1,131 @@
 ---
 include:
-  - homepage/compose.yml
-  - authentik/compose.yml
   - adguardhome/compose.yml
   - homeassistant/compose.yml
-  - homepage/compose.yml
-  # - mailcow/docker-compose.yml
-  # - mealie/compose.yml
+  - mealie/compose.yml
   - media/compose.yml
   - paperless/compose.yml
   # - traccar/compose.yml
 
 services:
-  cloudflared:
-    image: cloudflare/cloudflared:2024.11.1
-    container_name: cloudflared
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    command: tunnel --no-autoupdate run
-    environment:
-      PUID: $PUID
-      PGID: $PGID
-      TZ: $TZ
-      TUNNEL_TOKEN: $TUNNEL_TOKEN
-
-  whatsupdocker:
-    image: getwud/wud:7.1.1
-    container_name: wud
-    restart: unless-stopped
+  watchtower:
+    image: containrrr/watchtower:1.7.1
+    container_name: watchtower
+    restart: always
     security_opt:
       - no-new-privileges:true
     environment:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
-    healthcheck:
-      test: wget --no-verbose --tries=1 --no-check-certificate --spider http://localhost:3000
-      interval: 10s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+      WATCHTOWER_CLEANUP: true
+      WATCHTOWER_SCHEDULE: 0 0 5 * * *
     volumes:
-      - $DATA/wud/store:/store
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  # twingate-connector:
+  #   image: twingate/connector:1
+  #   container_name: twingate
+  #   restart: always
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   environment:
+  #     TWINGATE_NETWORK: $TWINGATE_NETWORK
+  #     TWINGATE_ACCESS_TOKEN: $TWINGATE_ACCESS_TOKEN
+  #     TWINGATE_REFRESH_TOKEN: $TWINGATE_REFRESH_TOKEN
+  #     # - TWINGATE_LABEL_HOSTNAME="`hostname`"
+  #     # - TWINGATE_LABEL_DEPLOYED_BY="docker"
+
+  traefik:
+    image: traefik:v3.2
+    container_name: traefik
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--certificatesresolvers.myresolver.acme.dnschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.dnschallenge.provider=cloudflare"
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=$EMAIL"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    environment:
+      CF_API_EMAIL: $EMAIL
+      CF_DNS_API_TOKEN: $CF_DNS_API_TOKEN
+    volumes:
+      - $DATA/traefik/letsencrypt:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 80:80
+      - 443:443
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.$DOMAIN`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
+      - "traefik.http.routers.traefik.priority=10"
+      - "traefik.http.routers.traefik.middlewares=authelia@docker"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      - "homepage.group=Admin"
+      - "homepage.name=Traefik"
+      - "homepage.icon=sh-traefik"
+      - "homepage.href=https://traefik.$DOMAIN/"
+      - "homepage.weight=150"
+      - "homepage.widget.type=traefik"
+      - "homepage.widget.url=http://traefik:8080"
+
+  authelia:
+    image: authelia/authelia:4
+    container_name: authelia
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    volumes:
+      - $DATA/authelia:/config
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.authelia.rule=Host(`auth.$DOMAIN`)"
+      - "traefik.http.routers.authelia.entrypoints=websecure"
+      - "traefik.http.routers.authelia.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.authelia.forwardauth.address:=http://authelia:9091/api/authz/forward-auth"
+      - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
+      - "homepage.group=Admin"
+      - "homepage.name=Authelia"
+      - "homepage.icon=sh-authelia"
+      - "homepage.href=https://auth.$DOMAIN/"
+      - "homepage.weight=450"
+
+  homepage:
+    image: ghcr.io/gethomepage/homepage:v0.9.13
+    container_name: homepage
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges=true
+    volumes:
+      - $DATA/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
-      - 'wud.tag.include=^\d+\.\d+\.\d+$$'
-      - 'wud.link.template=https://github.com/getwud/wud/releases/tag/$${major}.$${minor}.$${patch}'
+      - "traefik.enable=true"
+      - "traefik.http.routers.homepage.rule=Host(`$DOMAIN`)||Host(`www.$DOMAIN`)||PathPrefix(`/`)"
+      - "traefik.http.routers.homepage.entrypoints=websecure"
+      - "traefik.http.routers.homepage.tls.certresolver=myresolver"
+      - "traefik.http.routers.homepage.priority=1"
+      - "traefik.http.services.homepage.loadbalancer.server.port=3000"
 
   code-server:
-    image: lscr.io/linuxserver/code-server:4.95.3
+    image: linuxserver/code-server:4.95.3
     container_name: code-server
     restart: unless-stopped
     security_opt:
@@ -58,7 +134,7 @@ services:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
-      # - PASSWORD=password #optional
+      PASSWORD: $CODE_PASSWORD
       # - HASHED_PASSWORD= #optional
       # - SUDO_PASSWORD=password #optional
       # - SUDO_PASSWORD_HASH= #optional
@@ -68,3 +144,50 @@ services:
       - $DATA/code-server:/config
       - /mnt/user/docker-nas:/config/workspace/docker-nas
       - /mnt/user/appdata:/config/workspace/appdata
+    ports:
+      - 8443:8443
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.code-server.rule=Host(`code.$DOMAIN`)"
+      - "traefik.http.routers.code-server.entrypoints=websecure"
+      - "traefik.http.routers.code-server.tls.certresolver=myresolver"
+      - "traefik.http.routers.code-server.priority=10"
+      - "traefik.http.services.code-server.loadbalancer.server.port=8443"
+      - "homepage.group=Admin"
+      - "homepage.name=Visual Studio Code"
+      - "homepage.icon=sh-visual-studio-code"
+      - "homepage.href=https://code.$DOMAIN/"
+      - "homepage.weight=500"
+
+  gotify:
+    image: gotify/server:2
+    container_name: gotify
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    user: $PUID:$PGID
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      GOTIFY_DEFAULTUSER_NAME: $GOTIFY_DEFAULTUSER_NAME
+      GOTIFY_DEFAULTUSER_PASS: $GOTIFY_DEFAULTUSER_PASS
+    volumes:
+      - $DATA/gotify/data:/app/data
+    ports:
+      - 8888:80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gotify.rule=Host(`gotify.$DOMAIN`)"
+      - "traefik.http.routers.gotify.entrypoints=websecure"
+      - "traefik.http.routers.gotify.tls.certresolver=myresolver"
+      - "traefik.http.routers.gotify.priority=10"
+      - "traefik.http.services.gotify.loadbalancer.server.port=80"
+      - "homepage.group=Admin"
+      - "homepage.name=Gotify"
+      - "homepage.icon=sh-gotify"
+      - "homepage.href=https://gotify.$DOMAIN/"
+      - "homepage.weight=350"
+      - "homepage.widget.type=gotify"
+      - "homepage.widget.url=http://gotify"
+      - "homepage.widget.key=$HOMEPAGE_GOTIFY_KEY"

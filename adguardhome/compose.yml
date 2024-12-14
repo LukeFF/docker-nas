@@ -1,15 +1,15 @@
 ---
 services:
   adguardhome:
-    image: adguard/adguardhome:v0.107.54
+    image: adguard/adguardhome:v0.107.55
     container_name: adguardhome
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     environment:
-      PUIG: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
+      PUIG: $PUID
+      PGID: $PGID
+      TZ: $TZ
     ports:
       - 53:53/tcp
       - 53:53/udp
@@ -28,3 +28,19 @@ services:
     volumes:
       - $DATA/adguard/conf:/opt/adguardhome/conf
       - $DATA/adguard/work:/opt/adguardhome/work
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.adguardhome.rule=Host(`adguard.$DOMAIN`)"
+      - "traefik.http.routers.adguardhome.entrypoints=websecure"
+      - "traefik.http.routers.adguardhome.tls.certresolver=myresolver"
+      - "traefik.http.routers.adguardhome.priority=10"
+      - "traefik.http.services.adguardhome.loadbalancer.server.port=80"
+      - "homepage.group=Admin"
+      - "homepage.name=Adguard Home"
+      - "homepage.icon=sh-adguard-home"
+      - "homepage.href=https://adguard.$DOMAIN/"
+      - "homepage.weight=200"
+      - "homepage.widget.type=adguard"
+      - "homepage.widget.url=http://adguardhome"
+      - "homepage.widget.username=$HOMEPAGE_ADGUARD_USER"
+      - "homepage.widget.password=$HOMEPAGE_ADGUARD_PASSWORD"

@@ -5,96 +5,287 @@ services:
     container_name: jellyfin
     restart: unless-stopped
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
     environment:
-      - DOCKER_MODS=linuxserver/mods:jellyfin-opencl-intel
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      DOCKER_MODS: linuxserver/mods:jellyfin-opencl-intel
     volumes:
-      - ${DATA}/jellyfin:/config
+      - $DATA/jellyfin:/config
       - /mnt/user/Serien:/data/serien
       - /mnt/user/Filme:/data/filme
+      - /mnt/user/eBooks:/data/books
     devices:
       - /dev/dri:/dev/dri
+    # ports:
+      # - 8096:8096
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin.rule=Host(`media.$DOMAIN`)"
+      - "traefik.http.routers.jellyfin.entrypoints=websecure"
+      - "traefik.http.routers.jellyfin.tls.certresolver=myresolver"
+      - "traefik.http.routers.jellyfin.priority=10"
+      - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+      - "homepage.group=Media"
+      - "homepage.name=Jellyfin"
+      - "homepage.icon=sh-jellyfin"
+      - "homepage.href=https://media.$DOMAIN/"
+      - "homepage.weight=0"
+      - "homepage.widget.type=jellyfin"
+      - "homepage.widget.url=http://jellyfin:8096"
+      - "homepage.widget.key=$HOMEPAGE_JELLYFIN_KEY"
 
   jellyseerr:
     image: fallenbagel/jellyseerr:2.1.0
     container_name: jellyseerr
     restart: unless-stopped
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
     volumes:
-      - ${DATA}/jellyseerr:/app/config
+      - $DATA/jellyseerr:/app/config
+    # ports:
+      # - 5055:5055
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyseerr.rule=Host(`request.$DOMAIN`)"
+      - "traefik.http.routers.jellyseerr.entrypoints=websecure"
+      - "traefik.http.routers.jellyseerr.tls.certresolver=myresolver"
+      - "traefik.http.routers.jellyseerr.priority=10"
+      - "traefik.http.services.jellyseerr.loadbalancer.server.port=5055"
+      - "homepage.group=Media"
+      - "homepage.name=Jellyseer"
+      - "homepage.icon=sh-jellyseerr"
+      - "homepage.weight=100"
+      - "homepage.href=https://request.$DOMAIN/"
+      - "homepage.widget.type=jellyseerr"
+      - "homepage.widget.url=http://jellyseerr:5055"
+      - "homepage.widget.key=$HOMEPAGE_JELLYSEERR_KEY"
 
   prowlarr:
     image: linuxserver/prowlarr:1.27.0
     container_name: prowlarr
     restart: unless-stopped
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
     volumes:
-      - ${DATA}/prowlarr:/config
+      - $DATA/prowlarr:/config
+    # ports:
+      # - 9696:9696
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prowlarr.rule=Host(`p.$DOMAIN`)"
+      - "traefik.http.routers.prowlarr.entrypoints=websecure"
+      - "traefik.http.routers.prowlarr.tls.certresolver=myresolver"
+      - "traefik.http.routers.prowlarr.priority=10"
+      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
+      - "homepage.group=Media Management"
+      - "homepage.name=Prowlarr"
+      - "homepage.icon=sh-prowlarr"
+      - "homepage.href=https://p.$DOMAIN/"
+      - "homepage.weight=0"
+      - "homepage.widget.type=prowlarr"
+      - "homepage.widget.url=http://prowlarr:9696"
+      - "homepage.widget.key=$HOMEPAGE_PROWLARR_KEY"
 
   radarr:
     image: linuxserver/radarr:5.15.1
     container_name: radarr
     restart: unless-stopped
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
     volumes:
-      - ${DATA}/radarr:/config
+      - $DATA/radarr:/config
       - /mnt/user/Filme:/movies
       - /mnt/user/Downloads:/downloads
+    # ports:
+      # - 7878:7878
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.radarr.rule=Host(`r.$DOMAIN`)"
+      - "traefik.http.routers.radarr.entrypoints=websecure"
+      - "traefik.http.routers.radarr.tls.certresolver=myresolver"
+      - "traefik.http.routers.radarr.priority=10"
+      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
+      - "homepage.group=Media Management"
+      - "homepage.name=Radarr"
+      - "homepage.icon=sh-radarr"
+      - "homepage.href=https://r.$DOMAIN/"
+      - "homepage.weight=100"
+      - "homepage.widget.type=radarr"
+      - "homepage.widget.url=http://radarr:7878"
+      - "homepage.widget.key=$HOMEPAGE_RADARR_KEY"
 
   sonarr:
     image: linuxserver/sonarr:4.0.11
     container_name: sonarr
     restart: unless-stopped
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
     volumes:
-      - ${DATA}/sonarr:/config
+      - $DATA/sonarr:/config
       - /mnt/user/Serien:/tv
       - /mnt/user/Downloads:/downloads
+    # ports:
+      # - 8989:8989
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sonarr.rule=Host(`s.$DOMAIN`)"
+      - "traefik.http.routers.sonarr.entrypoints=websecure"
+      - "traefik.http.routers.sonarr.tls.certresolver=myresolver"
+      - "traefik.http.routers.sonarr.priority=10"
+      - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
+      - "homepage.group=Media Management"
+      - "homepage.name=Sonarr"
+      - "homepage.icon=sh-sonarr"
+      - "homepage.href=https://s.$DOMAIN/"
+      - "homepage.weight=200"
+      - "homepage.widget.type=sonarr"
+      - "homepage.widget.url=http://sonarr:8989"
+      - "homepage.widget.key=$HOMEPAGE_SONARR_KEY"
 
   readarr:
     image: linuxserver/readarr:0.4.5-develop
     container_name: readarr
     restart: unless-stopped
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
     volumes:
-      - ${DATA}/readarr:/config
+      - $DATA/readarr:/config
       - /mnt/user/eBooks:/books
       - /mnt/user/Downloads:/downloads
+    # ports:
+      # - 8787:8787
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.readarr.rule=Host(`re.$DOMAIN`)"
+      - "traefik.http.routers.readarr.entrypoints=websecure"
+      - "traefik.http.routers.readarr.tls.certresolver=myresolver"
+      - "traefik.http.routers.readarr.priority=10"
+      - "traefik.http.services.readarr.loadbalancer.server.port=8787"
+      - "homepage.group=Media Management"
+      - "homepage.name=Readarr"
+      - "homepage.icon=sh-readarr"
+      - "homepage.href=https://re.$DOMAIN/"
+      - "homepage.weight=300"
+      - "homepage.widget.type=readarr"
+      - "homepage.widget.url=http://readarr:8787"
+      - "homepage.widget.key=$HOMEPAGE_READARR_KEY"
 
   calibre-web:
     image: linuxserver/calibre-web:0.6.24
     container_name: calibre-web
     restart: unless-stopped
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
     environment:
-      - DOCKER_MODS=linuxserver/mods:universal-calibre
-      - OAUTHLIB_RELAX_TOKEN_SCOPE=1
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      DOCKER_MODS: linuxserver/mods:universal-calibre
+      OAUTHLIB_RELAX_TOKEN_SCOPE: 1
     volumes:
-      - ${DATA}/calibre-web:/config
+      - $DATA/calibre-web:/config
       - /mnt/user/eBooks:/books
+    # ports:
+      # - 8083:8083
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.calibre-web.rule=Host(`library.$DOMAIN`)"
+      - "traefik.http.routers.calibre-web.entrypoints=websecure"
+      - "traefik.http.routers.calibre-web.tls.certresolver=myresolver"
+      - "traefik.http.routers.calibre-web.priority=10"
+      - "traefik.http.services.calibre-web.loadbalancer.server.port=8083"
+      - "homepage.group=Media"
+      - "homepage.name=Calibre Web"
+      - "homepage.icon=sh-calibre-web"
+      - "homepage.weight=200"
+      - "homepage.href=https://library.$DOMAIN/"
+      - "homepage.widget.type=calibreweb"
+      - "homepage.widget.url=http://calibre-web:8083"
+      - "homepage.widget.username=$HOMEPAGE_CALIBRE_USER"
+      - "homepage.widget.password=$HOMEPAGE_CALIBRE_PASSWORD"
 
   sabnzbd:
     image: linuxserver/sabnzbd:4.4.0
     container_name: sabnzbd
     restart: unless-stopped
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
     volumes:
-      - ${DATA}/sabnzbd:/config
+      - $DATA/sabnzbd:/config
       - /mnt/user/Downloads:/downloads
+    # ports:
+      # - 8880:8080
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sabnzbd.rule=Host(`sa.$DOMAIN`)"
+      - "traefik.http.routers.sabnzbd.entrypoints=websecure"
+      - "traefik.http.routers.sabnzbd.tls.certresolver=myresolver"
+      - "traefik.http.routers.sabnzbd.priority=10"
+      - "traefik.http.services.sabnzbd.loadbalancer.server.port=8080"
+      - "homepage.group=Media Management"
+      - "homepage.name=SABnzbd"
+      - "homepage.icon=sh-sabnzbd"
+      - "homepage.href=https://sa.$DOMAIN/"
+      - "homepage.weight=400"
+      - "homepage.widget.type=sabnzbd"
+      - "homepage.widget.url=http://sabnzbd:8080"
+      - "homepage.widget.key=$HOMEPAGE_SABNZBD_KEY"
 
   pyload-ng:
     image: linuxserver/pyload-ng:0.5.0
     container_name: pyload-ng
     restart: unless-stopped
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
     volumes:
-      - ${DATA}/pyload-ng:/config
+      - $DATA/pyload-ng:/config
       - /mnt/user/Downloads:/downloads
+    # ports:
+      # - 8000:8000
+      # - 9666:9666 #optional
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pyload.rule=Host(`py.$DOMAIN`)"
+      - "traefik.http.routers.pyload.entrypoints=websecure"
+      - "traefik.http.routers.pyload.tls.certresolver=myresolver"
+      - "traefik.http.routers.pyload.priority=10"
+      - "traefik.http.services.pyload.loadbalancer.server.port=8000"
+      - "homepage.group=Media Management"
+      - "homepage.name=Pyload"
+      - "homepage.icon=sh-pyload"
+      - "homepage.href=https://py.$DOMAIN/"
+      - "homepage.weight=500"
+      - "homepage.widget.type=pyload"
+      - "homepage.widget.url=http://pyload-ng:8000"
+      - "homepage.widget.username=$HOMEPAGE_PYLOAD_USER"
+      - "homepage.widget.password=$HOMEPAGE_PYLOAD_PASSWORD"

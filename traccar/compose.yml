@@ -11,10 +11,22 @@ services:
       - PGID
       - TZ
     volumes:
-      - ${DATA}/traccar/traccar.xml:/opt/traccar/conf/traccar.xml:ro
-      - ${DATA}/traccar/data:/opt/traccar/data
-      - ${DATA}/traccar/logs:/opt/traccar/logs
+      - $DATA/traccar/traccar.xml:/opt/traccar/conf/traccar.xml:ro
+      - $DATA/traccar/data:/opt/traccar/data
+      - $DATA/traccar/logs:/opt/traccar/logs
     # ports:
     # - 8082:8082
     # - 5000-5150:5000-5150
     # - 5000-5150:5000-5150/udp
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traccar.rule=Host(`track.$DOMAIN`)"
+      - "traefik.http.routers.traccar.entrypoints=websecure"
+      - "traefik.http.routers.traccar.tls.certresolver=myresolver"
+      - "traefik.http.routers.traccar.priority=10"
+      - "traefik.http.services.traccar.loadbalancer.server.port=8082"
+      - "homepage.group=Home Automation"
+      - "homepage.name=Traccar"
+      - "homepage.icon=sh-traccar"
+      - "homepage.weight=400"
+      - "homepage.href=https://track.$DOMAIN/"
