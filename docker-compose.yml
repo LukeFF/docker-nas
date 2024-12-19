@@ -125,7 +125,7 @@ services:
       - "traefik.http.services.homepage.loadbalancer.server.port=3000"
 
   code-server:
-    image: linuxserver/code-server:4.95.3
+    image: linuxserver/code-server:4.96.1
     container_name: code-server
     restart: unless-stopped
     security_opt:
