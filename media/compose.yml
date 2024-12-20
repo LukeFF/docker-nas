@@ -227,7 +227,7 @@ services:
       - "homepage.widget.password=$HOMEPAGE_CALIBRE_PASSWORD"
 
   sabnzbd:
-    image: linuxserver/sabnzbd:4.4.0
+    image: linuxserver/sabnzbd:4.4.1
     container_name: sabnzbd
     restart: unless-stopped
     security_opt:
