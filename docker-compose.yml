@@ -2,6 +2,7 @@
 include:
   - adguardhome/compose.yml
   - homeassistant/compose.yml
+  - kestra/compose.yml
   - mealie/compose.yml
   - media/compose.yml
   - paperless/compose.yml
@@ -108,7 +109,7 @@ services:
       - "homepage.weight=450"
 
   homepage:
-    image: ghcr.io/gethomepage/homepage:v0.9.13
+    image: ghcr.io/gethomepage/homepage:v0.10.1
     container_name: homepage
     restart: unless-stopped
     security_opt:
@@ -125,7 +126,7 @@ services:
       - "traefik.http.services.homepage.loadbalancer.server.port=3000"
 
   code-server:
-    image: linuxserver/code-server:4.96.1
+    image: linuxserver/code-server:4.96.2
     container_name: code-server
     restart: unless-stopped
     security_opt:
