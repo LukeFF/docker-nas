@@ -99,7 +99,9 @@ services:
       - "traefik.http.routers.authelia.rule=Host(`auth.$DOMAIN`)"
       - "traefik.http.routers.authelia.entrypoints=websecure"
       - "traefik.http.routers.authelia.tls.certresolver=myresolver"
-      - "traefik.http.middlewares.authelia.forwardauth.address:=http://authelia:9091/api/authz/forward-auth"
+      - "traefik.http.routers.authelia.priority=10"
+      - "traefik.http.services.authelia.loadbalancer.server.port=9091"
+      - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/authz/forward-auth"
       - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
       - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
       - "homepage.group=Admin"
@@ -109,7 +111,7 @@ services:
       - "homepage.weight=450"
 
   homepage:
-    image: ghcr.io/gethomepage/homepage:v0.10.1
+    image: ghcr.io/gethomepage/homepage:v0.10.2
     container_name: homepage
     restart: unless-stopped
     security_opt:
@@ -124,6 +126,7 @@ services:
       - "traefik.http.routers.homepage.tls.certresolver=myresolver"
       - "traefik.http.routers.homepage.priority=1"
       - "traefik.http.services.homepage.loadbalancer.server.port=3000"
+      - "traefik.http.routers.homepage.middlewares=authelia@docker"
 
   code-server:
     image: linuxserver/code-server:4.96.2
@@ -154,11 +157,12 @@ services:
       - "traefik.http.routers.code-server.tls.certresolver=myresolver"
       - "traefik.http.routers.code-server.priority=10"
       - "traefik.http.services.code-server.loadbalancer.server.port=8443"
+      - "traefik.http.routers.code-server.middlewares=authelia@docker"
       - "homepage.group=Admin"
       - "homepage.name=Visual Studio Code"
       - "homepage.icon=sh-visual-studio-code"
       - "homepage.href=https://code.$DOMAIN/"
-      - "homepage.weight=500"
+      - "homepage.weight=600"
 
   gotify:
     image: gotify/server:2
