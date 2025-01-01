@@ -111,7 +111,7 @@ services:
       - "homepage.weight=450"
 
   homepage:
-    image: ghcr.io/gethomepage/homepage:v0.10.6
+    image: ghcr.io/gethomepage/homepage:v0.10.7
     container_name: homepage
     restart: unless-stopped
     security_opt:
