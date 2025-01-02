@@ -19,7 +19,7 @@ services:
       - $DATA/kestra/postgres:/var/lib/postgresql/data
 
   kestra:
-    image: kestra/kestra:v0.20.8
+    image: kestra/kestra:v0.20.10
     container_name: kestra
     restart: unless-stopped
     security_opt:
