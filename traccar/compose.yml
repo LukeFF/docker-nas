@@ -25,7 +25,7 @@ services:
       - "traefik.http.routers.traccar.tls.certresolver=myresolver"
       - "traefik.http.routers.traccar.priority=10"
       - "traefik.http.services.traccar.loadbalancer.server.port=8082"
-      - "homepage.group=Home Automation"
+      - "homepage.group=Home"
       - "homepage.name=Traccar"
       - "homepage.icon=sh-traccar"
       - "homepage.weight=400"

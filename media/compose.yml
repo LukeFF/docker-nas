@@ -15,7 +15,7 @@ services:
       - $DATA/jellyfin:/config
       - /mnt/user/Serien:/data/serien
       - /mnt/user/Filme:/data/filme
-      - /mnt/user/eBooks:/data/books
+      - /mnt/user/Ebooks:/data/books
     devices:
       - /dev/dri:/dev/dri
     # ports:
@@ -37,7 +37,7 @@ services:
       - "homepage.widget.key=$HOMEPAGE_JELLYFIN_KEY"
 
   jellyseerr:
-    image: fallenbagel/jellyseerr:2.1.0
+    image: fallenbagel/jellyseerr:2.2.3
     container_name: jellyseerr
     restart: unless-stopped
     security_opt:
@@ -175,7 +175,7 @@ services:
       TZ: $TZ
     volumes:
       - $DATA/readarr:/config
-      - /mnt/user/eBooks:/books
+      - /mnt/user/Ebooks:/books
       - /mnt/user/Downloads:/downloads
     # ports:
       # - 8787:8787
@@ -210,7 +210,7 @@ services:
       OAUTHLIB_RELAX_TOKEN_SCOPE: 1
     volumes:
       - $DATA/calibre-web:/config
-      - /mnt/user/eBooks:/books
+      - /mnt/user/Ebooks:/books
     # ports:
       # - 8083:8083
     labels:
