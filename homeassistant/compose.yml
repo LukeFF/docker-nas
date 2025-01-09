@@ -33,6 +33,21 @@ services:
       - "homepage.widget.url=http://$IP:8123"
       - "homepage.widget.key=$HOMEPAGE_HOMEASSISTANT_KEY"
 
+  esphome:
+    image: esphome/esphome:2024.12.2
+    container_name: esphome
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges=true
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    volumes:
+      - $DATA/esphome:/config
+    ports:
+      - 6052:6052
+
   frigate:
     image: ghcr.io/blakeblackshear/frigate:0.14.1
     container_name: frigate
