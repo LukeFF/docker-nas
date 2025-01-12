@@ -1,7 +1,6 @@
 ---
 include:
   - adguardhome/compose.yml
-  - homeassistant/compose.yml
   - kestra/compose.yml
   - mealie/compose.yml
   - media/compose.yml
@@ -50,8 +49,8 @@ services:
       - $DATA/traefik/letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
-      - 80:80
-      - 443:443
+      - $IP:80:80
+      - $IP:443:443
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`traefik.$DOMAIN`)"
@@ -135,7 +134,7 @@ services:
       - /mnt/user/docker-nas:/config/workspace/docker-nas
       - /mnt/user/appdata:/config/workspace/appdata
     ports:
-      - 8443:8443
+      - $IP:8443:8443
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.code-server.rule=Host(`code.$DOMAIN`)"

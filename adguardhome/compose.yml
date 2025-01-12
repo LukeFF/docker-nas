@@ -3,6 +3,8 @@ services:
   adguardhome:
     image: adguard/adguardhome:v0.107.55
     container_name: adguardhome
+    hostname: adguard.$DOMAIN
+    domainname: adguard.$DOMAIN
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -10,21 +12,10 @@ services:
       PUIG: $PUID
       PGID: $PGID
       TZ: $TZ
-    ports:
-      - 53:53/tcp
-      - 53:53/udp
-      - 67:67/udp
-      # - 68:68/udp
-      # - 8088:80/tcp
-      # - 8444:443/tcp
-      # - 8444:443/udp
-      # - 3000:3000/tcp
-      - 853:853/tcp
-      - 784:784/udp
-      - 853:853/udp
-      - 8853:8853/udp
-      - 5443:5443/tcp
-      - 5443:5443/udp
+    networks:
+      default:
+      br0:
+        ipv4_address: $ADGUARD_IP
     volumes:
       - $DATA/adguard/conf:/opt/adguardhome/conf
       - $DATA/adguard/work:/opt/adguardhome/work
@@ -44,3 +35,8 @@ services:
       - "homepage.widget.url=http://adguardhome"
       - "homepage.widget.username=$HOMEPAGE_ADGUARD_USER"
       - "homepage.widget.password=$HOMEPAGE_ADGUARD_PASSWORD"
+
+networks:
+  br0:
+    name: br0
+    external: true
