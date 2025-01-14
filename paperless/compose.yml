@@ -24,7 +24,7 @@ services:
       - $DATA/paperless/mariadb:/var/lib/mysql
 
   paperless-ngx:
-    image: ghcr.io/paperless-ngx/paperless-ngx:2.13
+    image: ghcr.io/paperless-ngx/paperless-ngx:2.14
     container_name: paperless-ngx
     restart: unless-stopped
     security_opt:
