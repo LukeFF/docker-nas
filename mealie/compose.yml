@@ -14,6 +14,7 @@ services:
       MAX_WORKERS: 1
       WEB_CONCURRENCY: 1
       BASE_URL: https://mealie.$DOMAIN
+      OPENAI_API_KEY: $OPENAI_API_KEY
     volumes:
       - $DATA/mealie:/app/data
     labels:
@@ -27,7 +28,7 @@ services:
       - "homepage.name=Mealie"
       - "homepage.icon=sh-mealie"
       - "homepage.weight=200"
-      - "homepage.href=https://mealie.$DOMAIN/"
+      - "homepage.href=https://mealie.$DOMAIN"
       - "homepage.widget.type=mealie"
       - "homepage.widget.url=http://mealie:9000"
       - "homepage.widget.key=$HOMEPAGE_MEALIE_KEY"

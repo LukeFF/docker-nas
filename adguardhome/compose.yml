@@ -17,22 +17,17 @@ services:
       br0:
         ipv4_address: $ADGUARD_IP
     volumes:
+      - $DATA/adguard/cert:/opt/adguardhome/cert
       - $DATA/adguard/conf:/opt/adguardhome/conf
       - $DATA/adguard/work:/opt/adguardhome/work
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.adguardhome.rule=Host(`adguard.$DOMAIN`)"
-      - "traefik.http.routers.adguardhome.entrypoints=websecure"
-      - "traefik.http.routers.adguardhome.tls.certresolver=myresolver"
-      - "traefik.http.routers.adguardhome.priority=10"
-      - "traefik.http.services.adguardhome.loadbalancer.server.port=80"
       - "homepage.group=Admin"
       - "homepage.name=Adguard Home"
       - "homepage.icon=sh-adguard-home"
-      - "homepage.href=https://adguard.$DOMAIN/"
+      - "homepage.href=https://adguard.$DOMAIN"
       - "homepage.weight=200"
       - "homepage.widget.type=adguard"
-      - "homepage.widget.url=http://adguardhome"
+      - "homepage.widget.url=https://adguard.$DOMAIN"
       - "homepage.widget.username=$HOMEPAGE_ADGUARD_USER"
       - "homepage.widget.password=$HOMEPAGE_ADGUARD_PASSWORD"
 

@@ -24,7 +24,7 @@ services:
       - $DATA/paperless/mariadb:/var/lib/mysql
 
   paperless-ngx:
-    image: ghcr.io/paperless-ngx/paperless-ngx:2.14
+    image: ghcr.io/paperless-ngx/paperless-ngx:2.13
     container_name: paperless-ngx
     restart: unless-stopped
     security_opt:
@@ -76,7 +76,7 @@ services:
       - "homepage.group=Home"
       - "homepage.name=Paperless"
       - "homepage.icon=sh-paperless-ngx"
-      - "homepage.href=https://paper.$DOMAIN/"
+      - "homepage.href=https://paper.$DOMAIN"
       - "homepage.weight=300"
       - "homepage.widget.type=paperlessngx"
       - "homepage.widget.url=http://paperless-ngx:8000"

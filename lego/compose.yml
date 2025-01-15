@@ -1,0 +1,16 @@
+services:
+  lego:
+    image: goacme/lego:v4.21
+    container_name: lego
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command: --email $EMAIL --dns cloudflare --domains adguard.$DOMAIN --accept-tos run
+    # command: --email $EMAIL --dns cloudflare --domains adguard.$DOMAIN --accept-tos renew
+    environment:
+      PUIG: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      CF_DNS_API_TOKEN: $CF_DNS_API_TOKEN
+    volumes:
+      - $DATA/lego:/.lego

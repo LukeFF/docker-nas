@@ -29,4 +29,4 @@ services:
       - "homepage.name=Traccar"
       - "homepage.icon=sh-traccar"
       - "homepage.weight=400"
-      - "homepage.href=https://track.$DOMAIN/"
+      - "homepage.href=https://track.$DOMAIN"

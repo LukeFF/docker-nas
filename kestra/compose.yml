@@ -19,7 +19,7 @@ services:
       - $DATA/kestra/postgres:/var/lib/postgresql/data
 
   kestra:
-    image: kestra/kestra:v0.20.12
+    image: kestra/kestra:v0.20.11
     container_name: kestra
     restart: unless-stopped
     security_opt:
@@ -54,7 +54,7 @@ services:
           tasks:
             tmpDir:
               path: /tmp/kestra-wd/tmp
-          url: https://kestra.$DOMAIN/
+          url: https://kestra.$DOMAIN
     volumes:
       - $DATA/kestra/storage:/app/storage
       - /tmp/kestra-wd:/tmp/kestra-wd
@@ -71,4 +71,4 @@ services:
       - "homepage.name=Kestra"
       - "homepage.icon=sh-kestra"
       - "homepage.weight=500"
-      - "homepage.href=https://kestra.$DOMAIN/"
+      - "homepage.href=https://kestra.$DOMAIN"

@@ -2,6 +2,7 @@
 include:
   - adguardhome/compose.yml
   - kestra/compose.yml
+  - lego/compose.yml
   - mealie/compose.yml
   - media/compose.yml
   - paperless/compose.yml
@@ -62,7 +63,7 @@ services:
       - "homepage.group=Admin"
       - "homepage.name=Traefik"
       - "homepage.icon=sh-traefik"
-      - "homepage.href=https://traefik.$DOMAIN/"
+      - "homepage.href=https://traefik.$DOMAIN"
       - "homepage.weight=150"
       - "homepage.widget.type=traefik"
       - "homepage.widget.url=http://traefik:8080"
@@ -92,7 +93,7 @@ services:
       - "homepage.group=Admin"
       - "homepage.name=Authelia"
       - "homepage.icon=sh-authelia"
-      - "homepage.href=https://auth.$DOMAIN/"
+      - "homepage.href=https://auth.$DOMAIN"
       - "homepage.weight=450"
 
   homepage:
@@ -146,7 +147,7 @@ services:
       - "homepage.group=Admin"
       - "homepage.name=Visual Studio Code"
       - "homepage.icon=sh-visual-studio-code"
-      - "homepage.href=https://code.$DOMAIN/"
+      - "homepage.href=https://code.$DOMAIN"
       - "homepage.weight=600"
 
   gotify:
@@ -176,7 +177,7 @@ services:
       - "homepage.group=Admin"
       - "homepage.name=Gotify"
       - "homepage.icon=sh-gotify"
-      - "homepage.href=https://gotify.$DOMAIN/"
+      - "homepage.href=https://gotify.$DOMAIN"
       - "homepage.weight=350"
       - "homepage.widget.type=gotify"
       - "homepage.widget.url=http://gotify"
