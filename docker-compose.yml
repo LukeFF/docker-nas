@@ -115,7 +115,7 @@ services:
       - "traefik.http.routers.homepage.middlewares=authelia@docker"
 
   code-server:
-    image: linuxserver/code-server:4.96.2
+    image: linuxserver/code-server:4.96.4
     container_name: code-server
     restart: unless-stopped
     security_opt:
