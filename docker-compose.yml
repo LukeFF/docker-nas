@@ -1,6 +1,7 @@
 ---
 include:
   - adguardhome/compose.yml
+  - ferdium/compose.yml
   - kestra/compose.yml
   - lego/compose.yml
   - mealie/compose.yml
@@ -148,7 +149,7 @@ services:
       - "homepage.name=Visual Studio Code"
       - "homepage.icon=sh-visual-studio-code"
       - "homepage.href=https://code.$DOMAIN"
-      - "homepage.weight=600"
+      - "homepage.weight=900"
 
   gotify:
     image: gotify/server:2

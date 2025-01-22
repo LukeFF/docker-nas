@@ -5,8 +5,8 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    command: --email $EMAIL --dns cloudflare --domains adguard.$DOMAIN --accept-tos run
-    # command: --email $EMAIL --dns cloudflare --domains adguard.$DOMAIN --accept-tos renew
+    # command: --email $EMAIL --dns cloudflare $LEGO_DOMAINS --accept-tos run
+    command: --email $EMAIL --dns cloudflare $LEGO_DOMAINS renew
     environment:
       PUIG: $PUID
       PGID: $PGID

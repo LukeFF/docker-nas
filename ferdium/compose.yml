@@ -1,0 +1,48 @@
+---
+services:
+  ferdium-server:
+    image: ferdium/ferdium-server:latest
+    container_name: ferdium-server
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - NODE_ENV=production
+      - APP_URL=ferdium.$DOMAIN
+      - DB_CONNECTION=sqlite
+      - DB_HOST=127.0.0.1
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_DATABASE=ferdium
+      - DB_SSL=false
+      - MAIL_CONNECTION=smtp
+      - SMTP_HOST=127.0.0.1
+      - SMTP_PORT=2525
+      - MAIL_SSL=false
+      - MAIL_USERNAME=username
+      - MAIL_PASSWORD=password
+      - MAIL_SENDER=noreply@ferdium.org
+      - IS_CREATION_ENABLED=true
+      - IS_DASHBOARD_ENABLED=true
+      - IS_REGISTRATION_ENABLED=true
+      - CONNECT_WITH_FRANZ=true
+      - DATA_DIR=/data
+      - JWT_USE_PEM=true
+    volumes:
+      - $DATA/ferdium/data:/data
+      - $DATA/ferdium/recipes:/app/build/recipes
+    ports:
+      - 3333:3333
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ferdium.rule=Host(`ferdium.$DOMAIN`)"
+      - "traefik.http.routers.ferdium.entrypoints=websecure"
+      - "traefik.http.routers.ferdium.tls.certresolver=myresolver"
+      - "traefik.http.routers.ferdium.priority=10"
+      - "traefik.http.services.ferdium.loadbalancer.server.port=3333"
+      - "homepage.group=Admin"
+      - "homepage.name=Ferdium API"
+      - "homepage.icon=sh-ferdium"
+      - "homepage.href=https://ferdium.$DOMAIN"
+      - "homepage.weight=700"

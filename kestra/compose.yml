@@ -70,5 +70,5 @@ services:
       - "homepage.group=Admin"
       - "homepage.name=Kestra"
       - "homepage.icon=sh-kestra"
-      - "homepage.weight=500"
+      - "homepage.weight=800"
       - "homepage.href=https://kestra.$DOMAIN"
