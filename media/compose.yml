@@ -164,7 +164,7 @@ services:
       - "homepage.widget.key=$HOMEPAGE_SONARR_KEY"
 
   readarr:
-    image: linuxserver/readarr:0.4.8-develop
+    image: linuxserver/readarr:0.4.9-develop
     container_name: readarr
     restart: unless-stopped
     security_opt:
