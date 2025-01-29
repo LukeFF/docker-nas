@@ -2,7 +2,6 @@
 include:
   - adguardhome/compose.yml
   - ferdium/compose.yml
-  - kestra/compose.yml
   - lego/compose.yml
   - mealie/compose.yml
   - media/compose.yml
