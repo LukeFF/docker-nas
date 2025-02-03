@@ -1,6 +1,7 @@
 ---
 include:
   - adguardhome/compose.yml
+  - changedetection/compose.yml
   - ferdium/compose.yml
   - lego/compose.yml
   - mealie/compose.yml

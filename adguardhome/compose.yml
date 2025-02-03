@@ -27,7 +27,7 @@ services:
       - "homepage.href=https://adguard.$DOMAIN"
       - "homepage.weight=200"
       - "homepage.widget.type=adguard"
-      - "homepage.widget.url=https://adguard.$DOMAIN"
+      - "homepage.widget.url=http://ADGUARD_IP"
       - "homepage.widget.username=$HOMEPAGE_ADGUARD_USER"
       - "homepage.widget.password=$HOMEPAGE_ADGUARD_PASSWORD"
 

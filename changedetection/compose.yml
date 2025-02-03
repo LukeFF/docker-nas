@@ -1,0 +1,34 @@
+---
+services:
+  changedetection:
+    image: lscr.io/linuxserver/changedetection.io:latest
+    container_name: changedetection
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      BASE_URL: https://change.$DOMAIN/
+      PLAYWRIGHT_DRIVER_URL:
+    volumes:
+      - $DATA/changedetection/config:/config
+    # ports:
+      # - 5000:5000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.changedetection.rule=Host(`change.$DOMAIN`)"
+      - "traefik.http.routers.changedetection.entrypoints=websecure"
+      - "traefik.http.routers.changedetection.tls.certresolver=myresolver"
+      - "traefik.http.routers.changedetection.priority=10"
+      - "traefik.http.routers.changedetection.middlewares=authelia@docker"
+      - "traefik.http.services.changedetection.loadbalancer.server.port=5000"
+      - "homepage.group=Home"
+      - "homepage.name=Changedetection.io"
+      - "homepage.icon=sh-changedetection"
+      - "homepage.href=https://change.$DOMAIN"
+      - "homepage.weight=150"
+      - "homepage.widget.type=changedetectionio"
+      - "homepage.widget.url=http://changedetection:5000"
+      - "homepage.widget.key=$HOMEPAGE_CHANGEDETECTION_KEY"
