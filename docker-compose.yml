@@ -32,7 +32,7 @@ services:
     security_opt:
       - no-new-privileges:true
     command:
-      #- "--log.level=DEBUG"
+      # - "--log.level=DEBUG"
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"

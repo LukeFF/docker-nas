@@ -19,7 +19,7 @@ services:
     devices:
       - /dev/dri:/dev/dri
     # ports:
-      # - 8096:8096
+    # - 8096:8096
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jellyfin.rule=Host(`media.$DOMAIN`)"
@@ -49,7 +49,7 @@ services:
     volumes:
       - $DATA/jellyseerr:/app/config
     # ports:
-      # - 5055:5055
+    # - 5055:5055
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.jellyseerr.rule=Host(`request.$DOMAIN`)"
@@ -79,7 +79,7 @@ services:
     volumes:
       - $DATA/prowlarr:/config
     # ports:
-      # - 9696:9696
+    # - 9696:9696
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.prowlarr.rule=Host(`p.$DOMAIN`)"
@@ -112,7 +112,7 @@ services:
       - /mnt/user/Filme:/movies
       - /mnt/user/Downloads:/downloads
     # ports:
-      # - 7878:7878
+    # - 7878:7878
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.radarr.rule=Host(`r.$DOMAIN`)"
@@ -145,7 +145,7 @@ services:
       - /mnt/user/Serien:/tv
       - /mnt/user/Downloads:/downloads
     # ports:
-      # - 8989:8989
+    # - 8989:8989
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.sonarr.rule=Host(`s.$DOMAIN`)"
@@ -178,7 +178,7 @@ services:
       - /mnt/user/Ebooks:/books
       - /mnt/user/Downloads:/downloads
     # ports:
-      # - 8787:8787
+    # - 8787:8787
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.readarr.rule=Host(`re.$DOMAIN`)"
@@ -212,7 +212,7 @@ services:
       - $DATA/calibre-web:/config
       - /mnt/user/Ebooks:/books
     # ports:
-      # - 8083:8083
+    # - 8083:8083
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.calibre-web.rule=Host(`library.$DOMAIN`)"
@@ -244,7 +244,7 @@ services:
       - $DATA/sabnzbd:/config
       - /mnt/user/Downloads:/downloads
     # ports:
-      # - 8880:8080
+    # - 8880:8080
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.sabnzbd.rule=Host(`sa.$DOMAIN`)"
@@ -275,8 +275,8 @@ services:
       - $DATA/pyload-ng:/config
       - /mnt/user/Downloads:/downloads
     # ports:
-      # - 8000:8000
-      # - 9666:9666 #optional
+    # - 8000:8000
+    # - 9666:9666 #optional
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.pyload.rule=Host(`py.$DOMAIN`)"

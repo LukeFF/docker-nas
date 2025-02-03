@@ -1,3 +1,4 @@
+---
 services:
   lego:
     image: goacme/lego:v4.21
